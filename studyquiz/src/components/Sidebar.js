@@ -5,12 +5,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase-browser';
 
-export default function Sidebar({ user, onCollapse }) {
+export default function Sidebar({ user, collapsed, mobileOpen, onToggleCollapse, onMobileClose }) {
   const pathname = usePathname();
   const supabase = createClient();
   const [subjects, setSubjects] = useState([]);
   const [expanded, setExpanded] = useState({});
-  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     loadSubjects();
@@ -47,21 +46,31 @@ export default function Sidebar({ user, onCollapse }) {
     { href: '/subjects', icon: '📚', label: 'Subjects' },
     { href: '/generate', icon: '✨', label: 'AI Generate' },
     { href: '/review', icon: '🔄', label: 'Review' },
+    { href: '/settings', icon: '⚙️', label: 'Settings' },
   ];
+
+  // On desktop (lg+): toggle collapse. On mobile: close sidebar.
+  const handleToggle = () => {
+    if (typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches) {
+      onToggleCollapse?.();
+    } else {
+      onMobileClose?.();
+    }
+  };
 
   return (
     <>
-      {/* Mobile Overlay */}
-      <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
-        style={{ display: collapsed ? 'none' : 'block' }}
-        onClick={() => { setCollapsed(true); onCollapse?.(true); }}
-      />
+      {/* Mobile Overlay - only rendered when mobile sidebar is open */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+          onClick={onMobileClose}
+        />
+      )}
 
       <aside
-        className={`fixed top-0 left-0 h-full z-50 lg:z-30 lg:sticky lg:top-0 flex flex-col border-r transition-all duration-300 ${
-          collapsed ? '-translate-x-full lg:translate-x-0 lg:w-[72px]' : 'translate-x-0 w-[280px]'
-        }`}
+        className={`fixed top-0 left-0 h-full z-50 lg:z-30 lg:sticky lg:top-0 flex flex-col border-r transition-all duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0 w-[280px] ${collapsed ? 'lg:w-[72px]' : ''}`}
         style={{
           background: 'var(--sidebar)',
           borderColor: 'var(--sidebar-border)',
@@ -70,25 +79,14 @@ export default function Sidebar({ user, onCollapse }) {
       >
         {/* Header */}
         <div className="flex items-center gap-3 px-5 py-5 border-b" style={{ borderColor: 'var(--sidebar-border)' }}>
-          <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0">
-            <span className="text-lg">🎓</span>
-          </div>
-          {!collapsed && (
-            <span className="text-lg font-bold gradient-text">StudyQuiz</span>
-          )}
           <button
-            onClick={() => { setCollapsed(!collapsed); onCollapse?.(!collapsed); }}
-            className="ml-auto w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-[var(--sidebar-accent)]"
-            style={{ color: 'var(--muted-foreground)' }}
+            onClick={handleToggle}
+            className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center flex-shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110"
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              {collapsed ? (
-                <path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              ) : (
-                <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              )}
-            </svg>
+            <span className="text-lg">🎓</span>
           </button>
+          <span className={`text-lg font-bold gradient-text ${collapsed ? 'lg:hidden' : ''}`}>StudyQuiz</span>
         </div>
 
         {/* Nav Items */}
@@ -97,100 +95,82 @@ export default function Sidebar({ user, onCollapse }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                isActive(item.href) ? '' : 'hover:bg-[var(--sidebar-accent)]'
-              }`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isActive(item.href) ? '' : 'hover:bg-[var(--sidebar-accent)]'
+                }`}
               style={{
                 background: isActive(item.href) ? 'color-mix(in srgb, var(--primary) 12%, transparent)' : undefined,
                 color: isActive(item.href) ? 'var(--primary)' : 'var(--sidebar-foreground)',
               }}
+              onClick={() => onMobileClose?.()}
             >
               <span className="text-lg flex-shrink-0">{item.icon}</span>
-              {!collapsed && <span>{item.label}</span>}
+              <span className={collapsed ? 'lg:hidden' : ''}>{item.label}</span>
             </Link>
           ))}
 
-          {/* Subject Tree */}
-          {!collapsed && subjects.length > 0 && (
-            <div className="pt-4 mt-4 border-t" style={{ borderColor: 'var(--sidebar-border)' }}>
-              <p className="px-3 text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--muted-foreground)' }}>
-                My Subjects
-              </p>
-              {subjects.map((subject) => (
-                <div key={subject.id} className="mb-1">
-                  <button
-                    onClick={() => toggleExpand(subject.id)}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors hover:bg-[var(--sidebar-accent)]"
-                    style={{ color: 'var(--sidebar-foreground)' }}
-                  >
-                    <span className="flex-shrink-0">{subject.icon || '📚'}</span>
-                    <span className="truncate flex-1 text-left font-medium">{subject.name}</span>
-                    <svg
-                      width="12" height="12" viewBox="0 0 12 12" fill="none"
-                      className={`transition-transform duration-200 flex-shrink-0 ${expanded[subject.id] ? 'rotate-90' : ''}`}
+          {/* Subject Tree - hidden on desktop when collapsed, always visible on mobile */}
+          <div className={collapsed ? 'lg:hidden' : ''}>
+            {subjects.length > 0 && (
+              <div className="pt-4 mt-4 border-t" style={{ borderColor: 'var(--sidebar-border)' }}>
+                <p className="px-3 text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--muted-foreground)' }}>
+                  My Subjects
+                </p>
+                {subjects.map((subject) => (
+                  <div key={subject.id} className="mb-1">
+                    <button
+                      onClick={() => toggleExpand(subject.id)}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors hover:bg-[var(--sidebar-accent)]"
+                      style={{ color: 'var(--sidebar-foreground)' }}
                     >
-                      <path d="M4 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
-                  </button>
-
-                  {expanded[subject.id] && subject.courses?.map((course) => (
-                    <div key={course.id} className="ml-4">
-                      <Link
-                        href={`/subjects/${subject.id}/courses/${course.id}`}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors hover:bg-[var(--sidebar-accent)]"
-                        style={{
-                          color: pathname.includes(course.id)
-                            ? 'var(--primary)'
-                            : 'var(--muted-foreground)',
-                        }}
+                      <span className="flex-shrink-0">{subject.icon || '📚'}</span>
+                      <span className="truncate flex-1 text-left font-medium">{subject.name}</span>
+                      <svg
+                        width="12" height="12" viewBox="0 0 12 12" fill="none"
+                        className={`transition-transform duration-200 flex-shrink-0 ${expanded[subject.id] ? 'rotate-90' : ''}`}
                       >
-                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: subject.color || 'var(--primary)' }} />
-                        <span className="truncate">{course.course_code || course.name}</span>
-                      </Link>
-                      {pathname.includes(course.id) && course.units?.map((unit) => (
+                        <path d="M4 2l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    </button>
+
+                    {expanded[subject.id] && subject.courses?.map((course) => (
+                      <div key={course.id} className="ml-4">
                         <Link
-                          key={unit.id}
-                          href={`/subjects/${subject.id}/courses/${course.id}/units/${unit.id}`}
-                          className="flex items-center gap-2 ml-4 px-3 py-1 rounded-lg text-xs transition-colors hover:bg-[var(--sidebar-accent)]"
+                          href={`/subjects/${subject.id}/courses/${course.id}`}
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors hover:bg-[var(--sidebar-accent)]"
                           style={{
-                            color: pathname.includes(unit.id)
+                            color: pathname.includes(course.id)
                               ? 'var(--primary)'
                               : 'var(--muted-foreground)',
                           }}
+                          onClick={() => onMobileClose?.()}
                         >
-                          <span>○</span>
-                          <span className="truncate">{unit.title}</span>
+                          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: subject.color || 'var(--primary)' }} />
+                          <span className="truncate">{course.course_code || course.name}</span>
                         </Link>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
-        </nav>
-
-        {/* User Section */}
-        <div className="px-3 py-4 border-t" style={{ borderColor: 'var(--sidebar-border)' }}>
-          <div className="flex items-center gap-3 px-3">
-            <div
-              className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
-              style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
-            >
-              {user?.user_metadata?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
-            </div>
-            {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate" style={{ color: 'var(--sidebar-foreground)' }}>
-                  {user?.user_metadata?.full_name || 'Student'}
-                </p>
-                <p className="text-xs truncate" style={{ color: 'var(--muted-foreground)' }}>
-                  {user?.email}
-                </p>
+                        {pathname.includes(course.id) && course.units?.map((unit) => (
+                          <Link
+                            key={unit.id}
+                            href={`/subjects/${subject.id}/courses/${course.id}/units/${unit.id}`}
+                            className="flex items-center gap-2 ml-4 px-3 py-1 rounded-lg text-xs transition-colors hover:bg-[var(--sidebar-accent)]"
+                            style={{
+                              color: pathname.includes(unit.id)
+                                ? 'var(--primary)'
+                                : 'var(--muted-foreground)',
+                            }}
+                            onClick={() => onMobileClose?.()}
+                          >
+                            <span>○</span>
+                            <span className="truncate">{unit.title}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ))}
               </div>
             )}
           </div>
-        </div>
+        </nav>
       </aside>
     </>
   );
