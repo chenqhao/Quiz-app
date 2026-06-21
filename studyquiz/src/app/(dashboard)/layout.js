@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 export default function DashboardLayout({ children }) {
   const [user, setUser] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
 
@@ -51,12 +52,15 @@ export default function DashboardLayout({ children }) {
     <div className="flex min-h-screen" style={{ background: 'var(--background)' }}>
       <Sidebar
         user={user}
-        onCollapse={(collapsed) => setSidebarCollapsed(collapsed)}
+        collapsed={sidebarCollapsed}
+        mobileOpen={mobileOpen}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onMobileClose={() => setMobileOpen(false)}
       />
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar
           user={user}
-          onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+          onToggleSidebar={() => setMobileOpen(prev => !prev)}
         />
         <main className="flex-1 p-6 lg:p-8 max-w-7xl mx-auto w-full">
           {children}
