@@ -44,6 +44,7 @@ export default function Sidebar({ user, collapsed, mobileOpen, onToggleCollapse,
   const navItems = [
     { href: '/', icon: '🏠', label: 'Dashboard' },
     { href: '/subjects', icon: '📚', label: 'Subjects' },
+    { href: '/calendar', icon: '🗓️', label: 'Calendar' },
     { href: '/generate', icon: '✨', label: 'AI Generate' },
     { href: '/review', icon: '🔄', label: 'Review' },
     { href: '/settings', icon: '⚙️', label: 'Settings' },
