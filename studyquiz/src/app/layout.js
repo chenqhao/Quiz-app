@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "StudyQuiz — Smart Study Platform",
+  title: "Quizzard — Smart Study Platform",
   description: "Organize your study material, generate AI questions, take quizzes, and track your progress.",
 };
 
