@@ -74,10 +74,10 @@ export default function DashboardPage() {
   };
 
   const statCards = [
-    { label: 'Subjects', value: stats.subjects, icon: '📚', color: 'var(--primary)' },
-    { label: 'Courses', value: stats.courses, icon: '📖', color: 'var(--secondary)' },
-    { label: 'Questions', value: stats.questions, icon: '❓', color: 'var(--accent)' },
-    { label: 'Quizzes Taken', value: recentQuizzes.length, icon: '✅', color: 'var(--success)' },
+    { label: 'Subjects', value: stats.subjects, icon: '📚', color: 'var(--primary)', href: '/subjects' },
+    { label: 'Courses', value: stats.courses, icon: '📖', color: 'var(--secondary)', href: '/subjects' },
+    { label: 'Questions', value: stats.questions, icon: '❓', color: 'var(--accent)', href: '/review' },
+    { label: 'Quizzes Taken', value: recentQuizzes.length, icon: '✅', color: 'var(--success)', href: '/review' },
   ];
 
   if (loading) {
@@ -108,9 +108,10 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card, i) => (
-          <div
+          <Link
+            href={card.href || '#'}
             key={card.label}
-            className={`rounded-2xl p-5 border hover-lift transition-all duration-300 animate-fade-in stagger-${i + 1}`}
+            className={`block rounded-2xl p-5 border hover-lift transition-all duration-300 animate-fade-in stagger-${i + 1}`}
             style={{ background: 'var(--card)', borderColor: 'var(--border)', opacity: 0, animationFillMode: 'forwards' }}
           >
             <div className="flex items-center justify-between mb-3">
@@ -123,7 +124,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <p className="text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>{card.label}</p>
-          </div>
+          </Link>
         ))}
       </div>
 
