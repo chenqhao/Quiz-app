@@ -250,3 +250,79 @@
   .stagger-5 { animation-delay: 0.25s; }
   .stagger-6 { animation-delay: 0.3s; }
 }
+
+/* ============================================================
+   Timer Animations
+   ============================================================ */
+
+@keyframes timerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes timerCritical {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.02); }
+}
+
+@keyframes timerGlow {
+  0%, 100% { box-shadow: 0 0 8px color-mix(in srgb, var(--danger) 30%, transparent); }
+  50% { box-shadow: 0 0 20px color-mix(in srgb, var(--danger) 60%, transparent); }
+}
+
+.timer-warning {
+  animation: timerPulse 1.5s ease-in-out infinite;
+}
+
+.timer-critical {
+  animation: timerCritical 0.8s ease-in-out infinite, timerGlow 0.8s ease-in-out infinite;
+}
+
+/* ============================================================
+   Tab & Leaderboard Styles
+   ============================================================ */
+
+@keyframes rankSlideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-rank-slide {
+  animation: rankSlideIn 0.3s ease-out forwards;
+}
+
+.tab-active {
+  position: relative;
+}
+
+.tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 999px;
+}
+
+/* Copy button flash */
+@keyframes copyFlash {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.copy-flash {
+  animation: copyFlash 0.3s ease-out;
+}
+
+/* Badge pulse for unread mail */
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.badge-pulse {
+  animation: badgePulse 2s ease-in-out infinite;
+}
