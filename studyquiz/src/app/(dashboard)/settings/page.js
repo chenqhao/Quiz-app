@@ -19,6 +19,8 @@ export default function SettingsPage() {
   const [fullName, setFullName] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [friendCode, setFriendCode] = useState('');
+  const [codeCopied, setCodeCopied] = useState(false);
 
   useEffect(() => {
     loadUser();
@@ -32,6 +34,14 @@ export default function SettingsPage() {
         setFullName(user.user_metadata?.full_name || '');
         setDisplayName(user.user_metadata?.display_name || '');
         setAvatarUrl(user.user_metadata?.avatar_url || '');
+
+        // Load friend code from profiles
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('friend_code')
+          .eq('id', user.id)
+          .single();
+        setFriendCode(profile?.friend_code || '');
       }
     } catch (err) {
       console.error('Error loading user:', err);
@@ -384,6 +394,46 @@ export default function SettingsPage() {
               )}
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Friend Code Section */}
+      <div
+        className="rounded-2xl border p-6"
+        style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+      >
+        <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--foreground)' }}>
+          Your Friend Code
+        </h2>
+        <p className="text-xs mb-4" style={{ color: 'var(--muted-foreground)' }}>
+          Share this unique code so others can add you as a friend.
+        </p>
+        <div className="flex items-center gap-3">
+          <div
+            className="px-6 py-3 rounded-xl text-xl font-mono font-bold tracking-widest"
+            style={{
+              background: 'linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent), color-mix(in srgb, var(--secondary) 10%, transparent))',
+              color: 'var(--primary)',
+              border: '2px dashed var(--primary)',
+            }}
+          >
+            {friendCode || 'Loading...'}
+          </div>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(friendCode);
+              setCodeCopied(true);
+              setTimeout(() => setCodeCopied(false), 2000);
+            }}
+            className={`px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${codeCopied ? 'copy-flash' : ''}`}
+            style={{
+              background: codeCopied ? 'var(--success)' : 'var(--primary)',
+              color: codeCopied ? 'var(--success-foreground)' : 'var(--primary-foreground)',
+            }}
+            disabled={!friendCode}
+          >
+            {codeCopied ? '✓ Copied!' : '📋 Copy'}
+          </button>
         </div>
       </div>
 
