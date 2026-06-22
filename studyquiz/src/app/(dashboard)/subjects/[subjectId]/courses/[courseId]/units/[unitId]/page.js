@@ -21,7 +21,7 @@ export default function UnitDetailPage({ params }) {
   const [expandedQ, setExpandedQ] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const emptyMC = { type: 'multiple_choice', question_text: '', choices: ['', '', '', ''], correct_answer: '', explanation: '', difficulty: 'medium' };
+  const emptyMC = { type: 'multiple_choice', question_text: '', choices: ['', '', '', ''], correct_answers: [], explanation: '', difficulty: 'medium', is_multi_select: false };
   const emptyWritten = { type: 'written', question_text: '', correct_answer: '', explanation: '', difficulty: 'medium' };
   const [form, setForm] = useState(emptyMC);
 
@@ -48,9 +48,11 @@ export default function UnitDetailPage({ params }) {
         type: question.type,
         question_text: question.question_text,
         choices: question.type === 'multiple_choice' ? (question.choices || ['', '', '', '']) : ['', '', '', ''],
-        correct_answer: question.correct_answer,
+        correct_answers: question.type === 'multiple_choice' ? (question.correct_answer ? question.correct_answer.split('|||') : []) : [],
+        correct_answer: question.type === 'written' ? question.correct_answer : '',
         explanation: question.explanation || '',
         difficulty: question.difficulty,
+        is_multi_select: question.is_multi_select || false,
       });
     } else {
       setEditingQuestion(null);
@@ -68,9 +70,10 @@ export default function UnitDetailPage({ params }) {
       type: form.type,
       question_text: form.question_text.trim(),
       choices: form.type === 'multiple_choice' ? form.choices.filter(c => c.trim()) : null,
-      correct_answer: form.correct_answer.trim(),
+      correct_answer: form.type === 'multiple_choice' ? form.correct_answers.filter(c => c.trim()).join('|||') : form.correct_answer.trim(),
       explanation: form.explanation.trim() || null,
       difficulty: form.difficulty,
+      is_multi_select: form.type === 'multiple_choice' ? form.is_multi_select : false,
     };
 
     if (editingQuestion) {
@@ -262,18 +265,56 @@ export default function UnitDetailPage({ params }) {
 
           {form.type === 'multiple_choice' ? (
             <>
+              <div className="flex items-center gap-2 mb-2 p-3 rounded-xl border transition-all" style={{ background: 'var(--muted)', borderColor: 'var(--border)' }}>
+                <input type="checkbox" id="multi-select-toggle" checked={form.is_multi_select} onChange={(e) => setForm({ ...form, is_multi_select: e.target.checked, correct_answers: [] })} className="w-4 h-4 accent-[var(--primary)]" />
+                <label htmlFor="multi-select-toggle" className="text-sm font-semibold cursor-pointer select-none" style={{ color: 'var(--foreground)' }}>Allow multiple correct answers</label>
+              </div>
+              
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--foreground)' }}>Answer Choices</label>
                 <div className="space-y-2">
                   {form.choices.map((choice, ci) => (
                     <div key={ci} className="flex items-center gap-2">
-                      <input type="radio" name="correct" checked={form.correct_answer === choice && choice !== ''} onChange={() => setForm({ ...form, correct_answer: choice })} className="w-4 h-4 accent-[var(--primary)]" />
+                      <input 
+                        type={form.is_multi_select ? "checkbox" : "radio"} 
+                        name="correct" 
+                        checked={form.correct_answers.includes(choice) && choice !== ''} 
+                        onChange={() => {
+                          if (form.is_multi_select) {
+                            const newAnswers = form.correct_answers.includes(choice) 
+                              ? form.correct_answers.filter(c => c !== choice) 
+                              : [...form.correct_answers, choice];
+                            setForm({ ...form, correct_answers: newAnswers });
+                          } else {
+                            setForm({ ...form, correct_answers: [choice] });
+                          }
+                        }} 
+                        className="w-4 h-4 accent-[var(--primary)]" 
+                      />
                       <span className="text-sm font-bold w-6" style={{ color: 'var(--muted-foreground)' }}>{String.fromCharCode(65 + ci)}.</span>
-                      <input value={choice} onChange={(e) => { const c = [...form.choices]; c[ci] = e.target.value; setForm({ ...form, choices: c }); }} placeholder={`Option ${String.fromCharCode(65 + ci)}`} className="flex-1 px-3 py-2 rounded-lg border text-sm outline-none" style={{ background: 'var(--muted)', borderColor: 'var(--border)', color: 'var(--foreground)' }} />
+                      <input 
+                        value={choice} 
+                        onChange={(e) => { 
+                          const c = [...form.choices]; 
+                          const oldChoice = c[ci];
+                          const newVal = e.target.value;
+                          c[ci] = newVal; 
+                          let newAnswers = [...form.correct_answers];
+                          if (oldChoice !== '' && newAnswers.includes(oldChoice)) {
+                            newAnswers = newAnswers.map(ans => ans === oldChoice ? newVal : ans);
+                          }
+                          setForm({ ...form, choices: c, correct_answers: newAnswers }); 
+                        }} 
+                        placeholder={`Option ${String.fromCharCode(65 + ci)}`} 
+                        className="flex-1 px-3 py-2 rounded-lg border text-sm outline-none transition-colors" 
+                        style={{ background: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }} 
+                      />
                     </div>
                   ))}
                 </div>
-                <p className="text-xs mt-2" style={{ color: 'var(--muted-foreground)' }}>Select the radio button next to the correct answer</p>
+                <p className="text-xs mt-2" style={{ color: 'var(--muted-foreground)' }}>
+                  {form.is_multi_select ? 'Select checkboxes for all correct answers.' : 'Select the radio button next to the correct answer.'}
+                </p>
               </div>
             </>
           ) : (
@@ -305,7 +346,7 @@ export default function UnitDetailPage({ params }) {
 
           <div className="flex justify-end gap-3 pt-2">
             <button onClick={() => setModalOpen(false)} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Cancel</button>
-            <button id="save-question-btn" onClick={handleSave} disabled={saving || !form.question_text.trim() || !form.correct_answer.trim()} className="px-5 py-2.5 rounded-xl text-sm font-semibold hover-lift disabled:opacity-50" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>
+            <button id="save-question-btn" onClick={handleSave} disabled={saving || !form.question_text.trim() || (form.type === 'multiple_choice' ? form.correct_answers.length === 0 : !form.correct_answer.trim())} className="px-5 py-2.5 rounded-xl text-sm font-semibold hover-lift disabled:opacity-50" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>
               {saving ? 'Saving...' : editingQuestion ? 'Update' : 'Add Question'}
             </button>
           </div>

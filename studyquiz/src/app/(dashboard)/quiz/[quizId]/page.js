@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, useRef, useCallback, use } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { useRouter } from 'next/navigation';
 import { TypeBadge, DifficultyBadge } from '@/components/ui/Badge';
@@ -15,8 +15,19 @@ export default function ActiveQuizPage({ params }) {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  // Timer state
+  const [timerEnabled, setTimerEnabled] = useState(false);
+  const [timerDuration, setTimerDuration] = useState(0); // total seconds
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [startTime] = useState(Date.now());
+  const timerRef = useRef(null);
+  const hasAutoSubmitted = useRef(false);
+
   useEffect(() => {
     loadQuiz();
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, [quizId]);
 
   const loadQuiz = async () => {
@@ -24,6 +35,14 @@ export default function ActiveQuizPage({ params }) {
     if (qIds.length === 0) {
       router.push('/quiz/start');
       return;
+    }
+
+    // Check for timer config
+    const timerConfig = JSON.parse(sessionStorage.getItem(`quiz-timer-${quizId}`) || 'null');
+    if (timerConfig?.enabled && timerConfig.duration > 0) {
+      setTimerEnabled(true);
+      setTimerDuration(timerConfig.duration);
+      setTimeRemaining(timerConfig.duration);
     }
 
     const { data } = await supabase
@@ -37,13 +56,35 @@ export default function ActiveQuizPage({ params }) {
     setLoading(false);
   };
 
-  const currentQ = questions[currentIndex];
-  const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+  // Start timer once questions are loaded
+  useEffect(() => {
+    if (timerEnabled && timerDuration > 0 && !loading && questions.length > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeRemaining(prev => {
+          const next = prev - 1;
+          if (next <= 0) {
+            clearInterval(timerRef.current);
+            return 0;
+          }
+          return next;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [timerEnabled, timerDuration, loading, questions.length]);
 
-  const handleSubmit = async () => {
+  // Auto-submit memoized
+  const handleSubmit = useCallback(async (isAutoSubmit = false) => {
+    if (submitting) return;
     setSubmitting(true);
 
+    if (timerRef.current) clearInterval(timerRef.current);
+
     try {
+      const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+
       // Grade each answer
       const results = [];
       for (const q of questions) {
@@ -52,9 +93,21 @@ export default function ActiveQuizPage({ params }) {
         let feedback = null;
 
         if (q.type === 'multiple_choice') {
-          isCorrect = userAnswer === q.correct_answer;
+          // Parse correct answers (stored as '|||' delimited or single string)
+          const correctAnswers = q.correct_answer.includes('|||') 
+            ? q.correct_answer.split('|||').map(a => a.trim())
+            : [q.correct_answer.trim()];
+
+          // Parse user answers (stored as '|||' delimited for multi-select, or single string)
+          const userAnswers = typeof userAnswer === 'string' && userAnswer.includes('|||')
+            ? userAnswer.split('|||').map(a => a.trim())
+            : userAnswer ? [userAnswer.trim()] : [];
+
+          // Compare as sets
+          const correctSet = new Set(correctAnswers);
+          const userSet = new Set(userAnswers);
+          isCorrect = correctSet.size === userSet.size && [...correctSet].every(a => userSet.has(a));
         } else if (userAnswer.trim()) {
-          // Grade written answers via API
           try {
             const res = await fetch('/api/quiz/grade', {
               method: 'POST',
@@ -80,28 +133,58 @@ export default function ActiveQuizPage({ params }) {
           question_id: q.id,
           user_answer: userAnswer || null,
           is_correct: isCorrect,
-          ai_feedback: feedback,
+          ai_feedback: isAutoSubmit && !userAnswer ? 'Time ran out — not answered.' : feedback,
         });
       }
 
       // Save answers
       await supabase.from('quiz_answers').insert(results);
 
-      // Update score
+      // Update score + time
       const score = results.filter(r => r.is_correct).length;
       await supabase.from('quiz_attempts').update({
         score,
         total_questions: questions.length,
+        time_spent_seconds: elapsedSeconds,
+        timer_duration_seconds: timerEnabled ? timerDuration : null,
       }).eq('id', quizId);
 
       // Clean up sessionStorage
       sessionStorage.removeItem(`quiz-${quizId}`);
+      sessionStorage.removeItem(`quiz-timer-${quizId}`);
 
       router.push(`/quiz/${quizId}/results`);
     } catch (err) {
       console.error('Submit error:', err);
       setSubmitting(false);
     }
+  }, [submitting, questions, answers, quizId, startTime, timerEnabled, timerDuration, supabase, router]);
+
+  // Auto-submit when timer hits 0
+  useEffect(() => {
+    if (timerEnabled && timeRemaining <= 0 && !loading && questions.length > 0 && !hasAutoSubmitted.current) {
+      hasAutoSubmitted.current = true;
+      handleSubmit(true);
+    }
+  }, [timeRemaining, timerEnabled, loading, questions.length, handleSubmit]);
+
+  const currentQ = questions[currentIndex];
+  const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+
+  // Timer helpers
+  const formatTimer = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const timerPercentage = timerDuration > 0 ? (timeRemaining / timerDuration) * 100 : 100;
+  const timerClass = timerPercentage <= 10 ? 'timer-critical' : timerPercentage <= 25 ? 'timer-warning' : '';
+
+  const getTimerColor = () => {
+    if (timerPercentage > 50) return 'var(--success)';
+    if (timerPercentage > 25) return 'var(--warning)';
+    return 'var(--danger)';
   };
 
   if (loading) {
@@ -123,6 +206,42 @@ export default function ActiveQuizPage({ params }) {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
+      {/* Timer Bar */}
+      {timerEnabled && (
+        <div className={`rounded-2xl border p-4 transition-all ${timerClass}`} style={{
+          background: 'var(--card)',
+          borderColor: timerPercentage <= 10 ? 'var(--danger)' : 'var(--border)',
+        }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">⏱️</span>
+              <span
+                className="text-2xl font-mono font-bold tracking-wider"
+                style={{ color: getTimerColor() }}
+              >
+                {formatTimer(timeRemaining)}
+              </span>
+            </div>
+            <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+              {timerPercentage <= 10 ? '⚠️ Almost out of time!' : timerPercentage <= 25 ? 'Hurry up!' : 'Time remaining'}
+            </span>
+          </div>
+          <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--muted)' }}>
+            <div
+              className="h-full rounded-full transition-all duration-1000 ease-linear"
+              style={{
+                width: `${timerPercentage}%`,
+                background: timerPercentage > 50
+                  ? 'linear-gradient(90deg, var(--success), #059669)'
+                  : timerPercentage > 25
+                    ? 'linear-gradient(90deg, var(--warning), #d97706)'
+                    : 'linear-gradient(90deg, var(--danger), #dc2626)',
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Progress */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
@@ -151,22 +270,67 @@ export default function ActiveQuizPage({ params }) {
 
         {currentQ.type === 'multiple_choice' ? (
           <div className="space-y-3">
-            {currentQ.choices?.map((choice, ci) => (
-              <button
-                key={ci}
-                onClick={() => setAnswers({ ...answers, [currentQ.id]: choice })}
-                className="w-full text-left px-5 py-4 rounded-xl border text-sm font-medium transition-all"
-                style={{
-                  borderColor: answers[currentQ.id] === choice ? 'var(--primary)' : 'var(--border)',
-                  background: answers[currentQ.id] === choice ? 'color-mix(in srgb, var(--primary) 8%, transparent)' : 'var(--muted)',
-                  color: answers[currentQ.id] === choice ? 'var(--primary)' : 'var(--foreground)',
-                  boxShadow: answers[currentQ.id] === choice ? '0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent)' : 'none',
-                }}
-              >
-                <span className="font-bold mr-3" style={{ color: 'var(--muted-foreground)' }}>{String.fromCharCode(65 + ci)}.</span>
-                {choice}
-              </button>
-            ))}
+            {currentQ.is_multi_select && (
+              <p className="text-xs font-medium px-1 flex items-center gap-1.5" style={{ color: 'var(--accent)' }}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="2" width="10" height="10" rx="2"/><path d="M4.5 7l2 2 3-3.5"/></svg>
+                Select all correct answers
+              </p>
+            )}
+            {currentQ.choices?.map((choice, ci) => {
+              // For multi-select, answers[currentQ.id] is '|||'-delimited string
+              const isMulti = currentQ.is_multi_select;
+              const currentAnswers = isMulti 
+                ? (answers[currentQ.id] ? answers[currentQ.id].split('|||') : [])
+                : [answers[currentQ.id]];
+              const isSelected = currentAnswers.includes(choice);
+
+              const handleClick = () => {
+                if (isMulti) {
+                  // Toggle this choice in the array
+                  let next = answers[currentQ.id] ? answers[currentQ.id].split('|||') : [];
+                  if (next.includes(choice)) {
+                    next = next.filter(a => a !== choice);
+                  } else {
+                    next.push(choice);
+                  }
+                  setAnswers({ ...answers, [currentQ.id]: next.length > 0 ? next.join('|||') : '' });
+                } else {
+                  setAnswers({ ...answers, [currentQ.id]: choice });
+                }
+              };
+
+              return (
+                <button
+                  key={ci}
+                  onClick={handleClick}
+                  className="w-full text-left px-5 py-4 rounded-xl border text-sm font-medium transition-all"
+                  style={{
+                    borderColor: isSelected ? 'var(--primary)' : 'var(--border)',
+                    background: isSelected ? 'color-mix(in srgb, var(--primary) 8%, transparent)' : 'var(--muted)',
+                    color: isSelected ? 'var(--primary)' : 'var(--foreground)',
+                    boxShadow: isSelected ? '0 0 0 2px color-mix(in srgb, var(--primary) 20%, transparent)' : 'none',
+                  }}
+                >
+                  <span className="inline-flex items-center gap-3">
+                    {isMulti ? (
+                      <span
+                        className="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center border-2 transition-all text-xs"
+                        style={{
+                          borderColor: isSelected ? 'var(--primary)' : 'var(--border)',
+                          background: isSelected ? 'var(--primary)' : 'transparent',
+                          color: isSelected ? 'var(--primary-foreground)' : 'transparent',
+                        }}
+                      >
+                        {isSelected && '✓'}
+                      </span>
+                    ) : (
+                      <span className="font-bold" style={{ color: 'var(--muted-foreground)' }}>{String.fromCharCode(65 + ci)}.</span>
+                    )}
+                    {choice}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         ) : (
           <textarea
@@ -220,7 +384,7 @@ export default function ActiveQuizPage({ params }) {
         ) : (
           <button
             id="submit-quiz-btn"
-            onClick={handleSubmit}
+            onClick={() => handleSubmit(false)}
             disabled={submitting}
             className="px-6 py-2.5 rounded-xl text-sm font-bold transition-all hover-lift disabled:opacity-50"
             style={{ background: submitting ? 'var(--muted)' : 'var(--success)', color: submitting ? 'var(--muted-foreground)' : '#fff' }}

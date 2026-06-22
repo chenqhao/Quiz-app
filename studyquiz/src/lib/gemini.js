@@ -61,10 +61,13 @@ ${notes}
 RULES:
 - Only use information from the provided notes
 - Generate clear, well-formed questions
-- For multiple_choice: provide exactly 4 answer choices with only ONE correct answer
-- For written: provide a comprehensive sample answer and grading notes
+- For multiple_choice: provide exactly 4 answer choices
+- IMPORTANT: Some multiple choice questions CAN have multiple correct answers. When a question naturally has multiple correct answers (e.g., "Which of the following are true?", "Select all that apply"), set is_multi_select to true and put ALL correct answers in the correct_answers array.
+- For single-answer multiple choice, set is_multi_select to false and correct_answers should contain exactly one answer.
+- For written: provide a comprehensive sample answer and grading notes. Set is_multi_select to false.
 - Include a short explanation for each question
 - Set the difficulty to "${difficulty}"
+- CRITICAL: Every value in correct_answers MUST exactly match one of the strings in the choices array (character-for-character identical)
 
 Return a JSON array of objects with this exact schema:
 [
@@ -72,7 +75,8 @@ Return a JSON array of objects with this exact schema:
     "type": "multiple_choice" or "written",
     "question_text": "The question",
     "choices": ["A", "B", "C", "D"] (only for multiple_choice, null for written),
-    "correct_answer": "The correct answer text",
+    "correct_answers": ["The correct answer text"] (array — one item for single-answer, multiple for multi-select),
+    "is_multi_select": false (true if multiple answers are correct),
     "explanation": "Brief explanation of why this is correct",
     "difficulty": "${difficulty}"
   }
@@ -87,14 +91,38 @@ Return ONLY the JSON array, no other text.`;
     throw new Error('Invalid response format from AI');
   }
 
-  return questions.map((q) => ({
-    type: q.type || 'multiple_choice',
-    question_text: q.question_text || '',
-    choices: q.type === 'multiple_choice' ? (q.choices || []) : null,
-    correct_answer: q.correct_answer || '',
-    explanation: q.explanation || '',
-    difficulty: q.difficulty || difficulty,
-  }));
+  return questions.map((q) => {
+    // Normalize: support both old "correct_answer" string and new "correct_answers" array
+    let correctAnswers = q.correct_answers || [];
+    if (correctAnswers.length === 0 && q.correct_answer) {
+      correctAnswers = [q.correct_answer];
+    }
+
+    // For backward compat, also set correct_answer as the first correct answer
+    const correctAnswer = correctAnswers[0] || q.correct_answer || '';
+
+    // Ensure correct answers actually match choices exactly
+    if (q.type === 'multiple_choice' && q.choices) {
+      correctAnswers = correctAnswers.map(ca => {
+        const exactMatch = q.choices.find(c => c === ca);
+        if (exactMatch) return exactMatch;
+        // Try case-insensitive / trimmed match
+        const fuzzyMatch = q.choices.find(c => c.trim().toLowerCase() === ca.trim().toLowerCase());
+        return fuzzyMatch || ca;
+      });
+    }
+
+    return {
+      type: q.type || 'multiple_choice',
+      question_text: q.question_text || '',
+      choices: q.type === 'multiple_choice' ? (q.choices || []) : null,
+      correct_answer: correctAnswers.join('|||'), // Store multi-answers joined by delimiter
+      correct_answers: correctAnswers, // Keep array for preview
+      is_multi_select: q.is_multi_select || correctAnswers.length > 1,
+      explanation: q.explanation || '',
+      difficulty: q.difficulty || difficulty,
+    };
+  });
 }
 
 /**

@@ -164,15 +164,19 @@ export default function ReviewPage() {
                 <div className="mt-3 pt-3 border-t space-y-2 animate-fade-in" style={{ borderColor: 'var(--border)' }}>
                   {q.type === 'multiple_choice' && q.choices && (
                     <div className="space-y-1.5">
-                      {q.choices.map((c, ci) => (
-                        <div key={ci} className="text-xs px-3 py-1.5 rounded-lg" style={{
-                          background: c === q.correct_answer ? 'color-mix(in srgb, var(--success) 10%, transparent)' : 'var(--muted)',
-                          color: c === q.correct_answer ? 'var(--success)' : 'var(--muted-foreground)',
-                          fontWeight: c === q.correct_answer ? '600' : '400',
-                        }}>
-                          {String.fromCharCode(65 + ci)}. {c} {c === q.correct_answer && '✓'}
-                        </div>
-                      ))}
+                      {q.choices.map((c, ci) => {
+                        const correctAnswers = q.correct_answer ? q.correct_answer.split('|||').map(a => a.trim()) : [];
+                        const isCorrect = correctAnswers.includes(c);
+                        return (
+                          <div key={ci} className="text-xs px-3 py-1.5 rounded-lg" style={{
+                            background: isCorrect ? 'color-mix(in srgb, var(--success) 10%, transparent)' : 'var(--muted)',
+                            color: isCorrect ? 'var(--success)' : 'var(--muted-foreground)',
+                            fontWeight: isCorrect ? '600' : '400',
+                          }}>
+                            {String.fromCharCode(65 + ci)}. {c} {isCorrect && '✓'}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                   {q.type === 'written' && (

@@ -106,6 +106,7 @@ function GeneratePageContent() {
         explanation: q.explanation || null,
         difficulty: q.difficulty,
         created_by: 'ai',
+        is_multi_select: q.is_multi_select || false,
       }));
 
     const { error } = await supabase.from('questions').insert(toSave);
@@ -277,15 +278,22 @@ function GeneratePageContent() {
                   </div>
                   {q.type === 'multiple_choice' && q.choices && (
                     <div className="space-y-1.5 mb-2">
-                      {q.choices.map((c, ci) => (
-                        <div key={ci} className="text-xs px-3 py-1.5 rounded-lg" style={{
-                          background: c === q.correct_answer ? 'color-mix(in srgb, var(--success) 10%, transparent)' : 'var(--muted)',
-                          color: c === q.correct_answer ? 'var(--success)' : 'var(--muted-foreground)',
-                          fontWeight: c === q.correct_answer ? '600' : '400',
-                        }}>
-                          {String.fromCharCode(65 + ci)}. {c} {c === q.correct_answer && '✓'}
-                        </div>
-                      ))}
+                      {q.choices.map((c, ci) => {
+                        const correctList = q.correct_answers || (q.correct_answer ? q.correct_answer.split('|||') : []);
+                        const isCorrect = correctList.includes(c);
+                        return (
+                          <div key={ci} className="text-xs px-3 py-1.5 rounded-lg" style={{
+                            background: isCorrect ? 'color-mix(in srgb, var(--success) 10%, transparent)' : 'var(--muted)',
+                            color: isCorrect ? 'var(--success)' : 'var(--muted-foreground)',
+                            fontWeight: isCorrect ? '600' : '400',
+                          }}>
+                            {String.fromCharCode(65 + ci)}. {c} {isCorrect && '✓'}
+                          </div>
+                        );
+                      })}
+                      {q.is_multi_select && (
+                        <p className="text-xs font-medium mt-1" style={{ color: 'var(--accent)' }}>📋 Select all that apply</p>
+                      )}
                     </div>
                   )}
                   {q.type === 'written' && (

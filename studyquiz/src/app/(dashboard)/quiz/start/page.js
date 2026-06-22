@@ -18,6 +18,9 @@ function QuizStartContent() {
   const [questionCount, setQuestionCount] = useState(10);
   const [availableCount, setAvailableCount] = useState(0);
   const [starting, setStarting] = useState(false);
+  const [timerEnabled, setTimerEnabled] = useState(false);
+  const [timerMinutes, setTimerMinutes] = useState(30);
+  const [timerSeconds, setTimerSeconds] = useState(0);
 
   useEffect(() => { loadSubjects(); }, []);
   useEffect(() => {
@@ -97,6 +100,16 @@ function QuizStartContent() {
 
     // Store question IDs in sessionStorage for the quiz page
     sessionStorage.setItem(`quiz-${attempt.id}`, JSON.stringify(qIds));
+
+    // Store timer config if enabled
+    if (timerEnabled) {
+      const totalSeconds = (timerMinutes * 60) + timerSeconds;
+      sessionStorage.setItem(`quiz-timer-${attempt.id}`, JSON.stringify({
+        duration: totalSeconds,
+        enabled: true,
+      }));
+    }
+
     router.push(`/quiz/${attempt.id}`);
   };
 
@@ -174,6 +187,86 @@ function QuizStartContent() {
             <input type="range" min="1" max={Math.max(availableCount, 1)} value={Math.min(questionCount, availableCount || 1)} onChange={(e) => setQuestionCount(Number(e.target.value))} className="flex-1 accent-[var(--primary)]" />
             <span className="text-lg font-bold w-10 text-center" style={{ color: 'var(--foreground)' }}>{Math.min(questionCount, availableCount || 0)}</span>
           </div>
+        </div>
+
+        {/* Timer Configuration */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>⏱️ Quiz Timer</label>
+            <button
+              onClick={() => setTimerEnabled(!timerEnabled)}
+              className="relative w-12 h-6 rounded-full transition-all duration-300 cursor-pointer"
+              style={{
+                background: timerEnabled ? 'var(--primary)' : 'var(--border)',
+              }}
+            >
+              <div
+                className="absolute top-0.5 w-5 h-5 rounded-full transition-all duration-300"
+                style={{
+                  left: timerEnabled ? '26px' : '2px',
+                  background: 'white',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                }}
+              />
+            </button>
+          </div>
+
+          {timerEnabled && (
+            <div className="space-y-3 animate-fade-in">
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--muted-foreground)' }}>Minutes</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="300"
+                    value={timerMinutes}
+                    onChange={(e) => setTimerMinutes(Math.max(0, Math.min(300, parseInt(e.target.value) || 0)))}
+                    className="w-full px-4 py-3 rounded-xl border text-sm text-center font-bold outline-none transition-all"
+                    style={selectStyle}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+                  />
+                </div>
+                <span className="text-xl font-bold mt-5" style={{ color: 'var(--muted-foreground)' }}>:</span>
+                <div className="flex-1">
+                  <label className="block text-xs font-medium mb-1" style={{ color: 'var(--muted-foreground)' }}>Seconds</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="59"
+                    value={timerSeconds}
+                    onChange={(e) => setTimerSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+                    className="w-full px-4 py-3 rounded-xl border text-sm text-center font-bold outline-none transition-all"
+                    style={selectStyle}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+                  />
+                </div>
+              </div>
+
+              {(timerMinutes > 0 || timerSeconds > 0) && availableCount > 0 && (
+                <div
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs"
+                  style={{
+                    background: 'color-mix(in srgb, var(--accent) 10%, transparent)',
+                    color: 'var(--accent)',
+                  }}
+                >
+                  <span>⏱️</span>
+                  <span>
+                    {timerMinutes > 0 ? `${timerMinutes}m` : ''}{timerSeconds > 0 ? ` ${timerSeconds}s` : ''} total
+                    {' · '}
+                    {(() => {
+                      const totalSec = (timerMinutes * 60) + timerSeconds;
+                      const perQ = Math.round(totalSec / Math.min(questionCount, availableCount));
+                      return `~${perQ}s per question`;
+                    })()}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
