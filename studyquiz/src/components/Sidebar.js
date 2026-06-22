@@ -105,7 +105,7 @@ export default function Sidebar({ user, collapsed, mobileOpen, onToggleCollapse,
           >
             <span className="text-lg">🎓</span>
           </button>
-          <span className={`text-lg font-bold gradient-text ${collapsed ? 'lg:hidden' : ''}`}>StudyQuiz</span>
+          <span className={`text-lg font-bold gradient-text ${collapsed ? 'lg:hidden' : ''}`}>Quizzard</span>
         </div>
 
         {/* Nav Items */}
