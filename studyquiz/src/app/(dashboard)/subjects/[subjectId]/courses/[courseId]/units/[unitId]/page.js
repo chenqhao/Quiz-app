@@ -62,7 +62,10 @@ export default function UnitDetailPage({ params }) {
   };
 
   const handleSave = async () => {
-    if (!form.question_text.trim() || !form.correct_answer.trim()) return;
+    if (!form.question_text?.trim()) return;
+    if (form.type === 'multiple_choice' && (!form.correct_answers || form.correct_answers.length === 0)) return;
+    if (form.type === 'written' && !form.correct_answer?.trim()) return;
+
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -70,19 +73,29 @@ export default function UnitDetailPage({ params }) {
       type: form.type,
       question_text: form.question_text.trim(),
       choices: form.type === 'multiple_choice' ? form.choices.filter(c => c.trim()) : null,
-      correct_answer: form.type === 'multiple_choice' ? form.correct_answers.filter(c => c.trim()).join('|||') : form.correct_answer.trim(),
-      explanation: form.explanation.trim() || null,
+      correct_answer: form.type === 'multiple_choice' ? form.correct_answers.filter(c => c.trim()).join('|||') : form.correct_answer?.trim() || '',
+      explanation: form.explanation?.trim() || null,
       difficulty: form.difficulty,
       is_multi_select: form.type === 'multiple_choice' ? form.is_multi_select : false,
     };
 
+    let error = null;
     if (editingQuestion) {
-      await supabase.from('questions').update(payload).eq('id', editingQuestion.id);
+      const res = await supabase.from('questions').update(payload).eq('id', editingQuestion.id);
+      error = res.error;
     } else {
-      await supabase.from('questions').insert({ ...payload, unit_id: unitId, user_id: user.id, created_by: 'manual' });
+      const res = await supabase.from('questions').insert({ ...payload, unit_id: unitId, user_id: user.id, created_by: 'manual' });
+      error = res.error;
     }
 
     setSaving(false);
+
+    if (error) {
+      console.error("DB Error:", error);
+      alert("Failed to save question: " + error.message + "\n\nDid you run the multi_select_migration.sql in Supabase?");
+      return;
+    }
+
     setModalOpen(false);
     loadData();
   };
@@ -300,7 +313,8 @@ export default function UnitDetailPage({ params }) {
                           const newVal = e.target.value;
                           c[ci] = newVal; 
                           let newAnswers = [...form.correct_answers];
-                          if (oldChoice !== '' && newAnswers.includes(oldChoice)) {
+                          // Update the selected answer if they edit the text of an already selected choice
+                          if (newAnswers.includes(oldChoice)) {
                             newAnswers = newAnswers.map(ans => ans === oldChoice ? newVal : ans);
                           }
                           setForm({ ...form, choices: c, correct_answers: newAnswers }); 
