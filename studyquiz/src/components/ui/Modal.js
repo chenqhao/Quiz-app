@@ -31,17 +31,19 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6"
       onClick={(e) => e.target === overlayRef.current && onClose()}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" style={{ animation: 'fadeIn 0.2s ease-out' }} />
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm pointer-events-none" style={{ animation: 'fadeIn 0.2s ease-out' }} />
 
-      {/* Modal */}
-      <div
-        className={`relative w-full ${sizeClasses[size]} rounded-2xl border shadow-2xl overflow-hidden animate-scale-in max-h-[90vh] flex flex-col`}
-        style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
-      >
+      {/* Modal Wrapper for centering */}
+      <div className="flex min-h-full items-center justify-center pointer-events-none">
+        {/* Modal */}
+        <div
+          className={`relative w-full ${sizeClasses[size]} rounded-2xl border shadow-2xl pointer-events-auto flex flex-col`}
+          style={{ background: 'var(--card)', borderColor: 'var(--border)', animation: 'scaleIn 0.2s ease-out', maxHeight: 'calc(100vh - 2rem)' }}
+        >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
           <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>{title}</h2>
@@ -60,6 +62,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
         <div className="px-6 py-5 overflow-y-auto flex-1">
           {children}
         </div>
+      </div>
       </div>
     </div>
   );

@@ -10,10 +10,25 @@ export default function Sidebar({ user, collapsed, mobileOpen, onToggleCollapse,
   const supabase = createClient();
   const [subjects, setSubjects] = useState([]);
   const [expanded, setExpanded] = useState({});
+  const [unreadMail, setUnreadMail] = useState(0);
 
   useEffect(() => {
     loadSubjects();
+    loadUnreadCount();
   }, []);
+
+  const loadUnreadCount = async () => {
+    try {
+      const { count } = await supabase
+        .from('quiz_mail')
+        .select('id', { count: 'exact', head: true })
+        .eq('is_read', false);
+      setUnreadMail(count || 0);
+    } catch (e) {
+      // quiz_mail table may not exist yet
+    }
+  };
+
 
   const loadSubjects = async () => {
     const { data } = await supabase
@@ -47,6 +62,9 @@ export default function Sidebar({ user, collapsed, mobileOpen, onToggleCollapse,
     { href: '/calendar', icon: '🗓️', label: 'Calendar' },
     { href: '/generate', icon: '✨', label: 'AI Generate' },
     { href: '/review', icon: '🔄', label: 'Review' },
+    { href: '/friends', icon: '👥', label: 'Friends' },
+    { href: '/leaderboard', icon: '🏆', label: 'Leaderboard' },
+    { href: '/inbox', icon: '📬', label: 'Inbox', badge: unreadMail },
     { href: '/settings', icon: '⚙️', label: 'Settings' },
   ];
 
@@ -106,6 +124,14 @@ export default function Sidebar({ user, collapsed, mobileOpen, onToggleCollapse,
             >
               <span className="text-lg flex-shrink-0">{item.icon}</span>
               <span className={collapsed ? 'lg:hidden' : ''}>{item.label}</span>
+              {item.badge > 0 && (
+                <span
+                  className={`ml-auto inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold badge-pulse ${collapsed ? 'lg:hidden' : ''}`}
+                  style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
+                >
+                  {item.badge}
+                </span>
+              )}
             </Link>
           ))}
 
