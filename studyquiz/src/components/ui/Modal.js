@@ -1,9 +1,14 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 export default function Modal({ isOpen, onClose, title, children, size = 'md' }) {
-  const overlayRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -19,7 +24,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const sizeClasses = {
     sm: 'max-w-md',
@@ -28,24 +33,27 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
     xl: 'max-w-4xl',
   };
 
-  return (
-    <div
-      ref={overlayRef}
-      className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6"
-      onClick={(e) => e.target === overlayRef.current && onClose()}
-    >
+  const modal = (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center">
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm pointer-events-none" style={{ animation: 'fadeIn 0.2s ease-out' }} />
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        style={{ animation: 'fadeIn 0.2s ease-out' }}
+        onClick={onClose}
+      />
 
-      {/* Modal Wrapper for centering */}
-      <div className="flex min-h-full items-center justify-center pointer-events-none">
-        {/* Modal */}
-        <div
-          className={`relative w-full ${sizeClasses[size]} rounded-2xl border shadow-2xl pointer-events-auto flex flex-col`}
-          style={{ background: 'var(--card)', borderColor: 'var(--border)', animation: 'scaleIn 0.2s ease-out', maxHeight: 'calc(100vh - 2rem)' }}
-        >
+      {/* Modal Panel */}
+      <div
+        className={`relative w-full ${sizeClasses[size]} rounded-2xl border shadow-2xl flex flex-col mx-4 sm:mx-6`}
+        style={{
+          background: 'var(--card)',
+          borderColor: 'var(--border)',
+          animation: 'scaleIn 0.2s ease-out',
+          maxHeight: '96vh',
+        }}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
           <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>{title}</h2>
           <button
             onClick={onClose}
@@ -59,11 +67,12 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 overflow-y-auto flex-1">
+        <div className="px-6 py-5 overflow-y-auto">
           {children}
         </div>
       </div>
-      </div>
     </div>
   );
+
+  return createPortal(modal, document.body);
 }
