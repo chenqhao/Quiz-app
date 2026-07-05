@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /* ============================================================
-   StudyQuiz — Design System
-   Calm, academic design with modern aesthetics
+   Quizzard — Apple-Inspired Design System
+   Clean, minimal, premium feel with Bento grid aesthetic
    ============================================================ */
 
 @theme inline {
@@ -30,67 +30,88 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent: var(--sidebar-accent);
   --color-ring: var(--ring);
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 1.25rem;
 }
 
-/* ---- Light Mode ---- */
+/* ---- Light Mode — Apple-inspired neutrals ---- */
 :root {
-  --background: #f8f9fc;
-  --foreground: #1a1d2e;
+  --background: #f5f5f7;
+  --foreground: #1d1d1f;
   --card: #ffffff;
-  --card-foreground: #1a1d2e;
-  --muted: #f1f3f9;
-  --muted-foreground: #6b7194;
-  --border: #e2e5ef;
-  --primary: #6366f1;
+  --card-foreground: #1d1d1f;
+  --muted: #f0f0f2;
+  --muted-foreground: #86868b;
+  --border: #e8e8ed;
+  --primary: #0071e3;
   --primary-foreground: #ffffff;
-  --secondary: #8b5cf6;
+  --secondary: #5856d6;
   --secondary-foreground: #ffffff;
-  --accent: #3b82f6;
+  --accent: #007aff;
   --accent-foreground: #ffffff;
-  --success: #10b981;
+  --success: #30d158;
   --success-foreground: #ffffff;
-  --danger: #ef4444;
+  --danger: #ff3b30;
   --danger-foreground: #ffffff;
-  --warning: #f59e0b;
+  --warning: #ff9f0a;
   --warning-foreground: #ffffff;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #1a1d2e;
-  --sidebar-border: #e2e5ef;
-  --sidebar-accent: #f1f3f9;
-  --ring: #6366f1;
+  --sidebar: #fbfbfd;
+  --sidebar-foreground: #1d1d1f;
+  --sidebar-border: #e8e8ed;
+  --sidebar-accent: #f0f0f2;
+  --ring: #0071e3;
+
+  /* Apple spacing scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Bento card tokens */
+  --card-radius: 20px;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --card-padding: 24px;
+
+  /* Top bar height */
+  --topbar-height: 56px;
 }
 
-/* ---- Dark Mode ---- */
+/* ---- Dark Mode — Apple-style dark ---- */
 .dark {
-  --background: #0f1117;
-  --foreground: #e4e6f0;
-  --card: #1a1d2e;
-  --card-foreground: #e4e6f0;
-  --muted: #252842;
-  --muted-foreground: #9499b8;
-  --border: #2d3152;
-  --primary: #818cf8;
-  --primary-foreground: #0f1117;
-  --secondary: #a78bfa;
-  --secondary-foreground: #0f1117;
-  --accent: #60a5fa;
-  --accent-foreground: #0f1117;
-  --success: #34d399;
-  --success-foreground: #0f1117;
-  --danger: #f87171;
-  --danger-foreground: #0f1117;
-  --warning: #fbbf24;
-  --warning-foreground: #0f1117;
-  --sidebar: #141625;
-  --sidebar-foreground: #e4e6f0;
-  --sidebar-border: #2d3152;
-  --sidebar-accent: #1e2139;
-  --ring: #818cf8;
+  --background: #000000;
+  --foreground: #f5f5f7;
+  --card: #1c1c1e;
+  --card-foreground: #f5f5f7;
+  --muted: #2c2c2e;
+  --muted-foreground: #98989d;
+  --border: #38383a;
+  --primary: #0a84ff;
+  --primary-foreground: #ffffff;
+  --secondary: #5e5ce6;
+  --secondary-foreground: #ffffff;
+  --accent: #0a84ff;
+  --accent-foreground: #ffffff;
+  --success: #30d158;
+  --success-foreground: #ffffff;
+  --danger: #ff453a;
+  --danger-foreground: #ffffff;
+  --warning: #ffd60a;
+  --warning-foreground: #1d1d1f;
+  --sidebar: #1c1c1e;
+  --sidebar-foreground: #f5f5f7;
+  --sidebar-border: #38383a;
+  --sidebar-accent: #2c2c2e;
+  --ring: #0a84ff;
+
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
 /* ============================================================
@@ -109,20 +130,26 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s ease, color 0.3s ease;
+    letter-spacing: -0.01em;
   }
 
   ::selection {
-    background: color-mix(in srgb, var(--primary) 30%, transparent);
+    background: color-mix(in srgb, var(--primary) 25%, transparent);
     color: var(--foreground);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.025em;
+    font-weight: 700;
   }
 }
 
 /* ============================================================
-   Animations
+   Animations — Smooth, Apple-like
    ============================================================ */
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -137,18 +164,33 @@
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideOverlayIn {
+  from { opacity: 0; transform: translateX(-100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOverlayOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-100%); }
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes pulse-ring {
   0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent); }
-  70% { box-shadow: 0 0 0 10px transparent; }
+  70% { box-shadow: 0 0 0 8px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
 
@@ -167,15 +209,15 @@
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
+  animation: fadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.5s ease-out forwards;
+  animation: slideUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.3s ease-out forwards;
+  animation: scaleIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .animate-shimmer {
@@ -190,7 +232,7 @@
 }
 
 /* ============================================================
-   Scrollbar
+   Scrollbar — Minimal Apple-style
    ============================================================ */
 
 ::-webkit-scrollbar {
@@ -203,13 +245,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--muted-foreground);
+  background: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
   border-radius: 999px;
-  opacity: 0.3;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  opacity: 0.5;
+  background: color-mix(in srgb, var(--muted-foreground) 50%, transparent);
 }
 
 /* ============================================================
@@ -219,8 +260,14 @@
 @layer utilities {
   .glass {
     background: color-mix(in srgb, var(--card) 80%, transparent);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  .glass-heavy {
+    background: color-mix(in srgb, var(--background) 72%, transparent);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
   }
 
   .gradient-primary {
@@ -234,15 +281,35 @@
     background-clip: text;
   }
 
+  /* Apple-style hover lift — subtle */
   .hover-lift {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
   .hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px -5px color-mix(in srgb, var(--foreground) 10%, transparent);
+    transform: translateY(-2px) scale(1.005);
+    box-shadow: var(--card-shadow-hover);
   }
 
+  /* Bento card base */
+  .bento-card {
+    background: var(--card);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    padding: var(--card-padding);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .bento-card:hover {
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  .bento-card-interactive:hover {
+    transform: scale(1.01);
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  /* Stagger delays */
   .stagger-1 { animation-delay: 0.05s; }
   .stagger-2 { animation-delay: 0.1s; }
   .stagger-3 { animation-delay: 0.15s; }
@@ -302,7 +369,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  background: var(--primary);
   border-radius: 999px;
 }
 
@@ -320,9 +387,42 @@
 /* Badge pulse for unread mail */
 @keyframes badgePulse {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
+  50% { transform: scale(1.15); }
 }
 
 .badge-pulse {
   animation: badgePulse 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   Library Panel Overlay
+   ============================================================ */
+
+.library-overlay {
+  animation: overlayFadeIn 0.25s ease-out forwards;
+}
+
+.library-panel {
+  animation: slideOverlayIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.library-panel-closing {
+  animation: slideOverlayOut 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* ============================================================
+   Apple-style section headers
+   ============================================================ */
+
+.section-header {
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--foreground);
+}
+
+.section-subtitle {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  margin-top: 2px;
 }
