@@ -8,8 +8,7 @@ import { useRouter } from 'next/navigation';
 
 export default function DashboardLayout({ children }) {
   const [user, setUser] = useState(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
 
@@ -41,28 +40,37 @@ export default function DashboardLayout({ children }) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
-          <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>Loading...</p>
+          <div
+            className="w-10 h-10 rounded-full border-2 border-t-transparent"
+            style={{
+              borderColor: 'var(--primary)',
+              borderTopColor: 'transparent',
+              animation: 'spin 1s linear infinite',
+            }}
+          />
+          <p className="text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen" style={{ background: 'var(--background)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
+      {/* Library overlay panel — no permanent sidebar */}
       <Sidebar
         user={user}
-        collapsed={sidebarCollapsed}
-        mobileOpen={mobileOpen}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        onMobileClose={() => setMobileOpen(false)}
+        isOpen={libraryOpen}
+        onClose={() => setLibraryOpen(false)}
       />
-      <div className="flex-1 flex flex-col min-w-0">
+
+      {/* Full-width content */}
+      <div className="flex flex-col min-h-screen">
         <TopBar
           user={user}
-          onToggleSidebar={() => setMobileOpen(prev => !prev)}
+          onToggleLibrary={() => setLibraryOpen(prev => !prev)}
+          libraryOpen={libraryOpen}
         />
-        <main className="flex-1 p-6 lg:p-8 max-w-7xl mx-auto w-full">
+        <main className="flex-1 px-5 lg:px-10 py-6 lg:py-8 max-w-6xl mx-auto w-full">
           {children}
         </main>
       </div>

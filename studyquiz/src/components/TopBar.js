@@ -1,11 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase-browser';
 import { useState } from 'react';
+import Link from 'next/link';
 
-export default function TopBar({ user, onToggleSidebar }) {
+export default function TopBar({ user, onToggleLibrary, libraryOpen }) {
   const router = useRouter();
+  const pathname = usePathname();
   const supabase = createClient();
   const [showMenu, setShowMenu] = useState(false);
 
@@ -21,51 +23,91 @@ export default function TopBar({ user, onToggleSidebar }) {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   };
 
+  // Page title from pathname
+  const getPageTitle = () => {
+    const segments = pathname.split('/').filter(Boolean);
+    if (segments.length === 0) return 'Home';
+    const page = segments[segments.length - 1];
+    return page.charAt(0).toUpperCase() + page.slice(1);
+  };
+
   return (
     <header
-      className="sticky top-0 z-20 flex items-center justify-between px-6 py-3 border-b backdrop-blur-md"
+      className="sticky top-0 z-20 flex items-center justify-between px-5 lg:px-8 glass-heavy border-b"
       style={{
-        background: 'color-mix(in srgb, var(--background) 85%, transparent)',
+        height: 'var(--topbar-height)',
         borderColor: 'var(--border)',
       }}
     >
-      {/* Mobile menu button */}
-      <button
-        onClick={onToggleSidebar}
-        className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center transition-colors hover:bg-[var(--muted)]"
-        style={{ color: 'var(--foreground)' }}
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-      </button>
+      {/* Left section: Logo + Library toggle */}
+      <div className="flex items-center gap-3">
+        {/* Graduation hat logo → navigates home */}
+        <Link
+          href="/"
+          className="flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer flex-shrink-0"
+          style={{ background: 'var(--primary)' }}
+          title="Go to Home"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+            <path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5" />
+          </svg>
+        </Link>
 
-      <div className="flex-1" />
+        {/* Library toggle button — like Spotify's "Your Library" */}
+        <button
+          onClick={onToggleLibrary}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          style={{
+            background: libraryOpen
+              ? 'color-mix(in srgb, var(--primary) 12%, transparent)'
+              : 'var(--muted)',
+            color: libraryOpen ? 'var(--primary)' : 'var(--foreground)',
+          }}
+          title="Your Library"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+          </svg>
+          <span className="hidden sm:inline">Your Library</span>
+        </button>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2">
+        {/* Page breadcrumb */}
+        <div className="hidden md:flex items-center gap-1.5 text-sm" style={{ color: 'var(--muted-foreground)' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+          <span className="font-medium" style={{ color: 'var(--foreground)' }}>{getPageTitle()}</span>
+        </div>
+      </div>
+
+      {/* Right section */}
+      <div className="flex items-center gap-1.5">
         {/* Dark mode toggle */}
         <button
           id="dark-mode-toggle"
           onClick={toggleDarkMode}
-          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 hover:bg-[var(--muted)]"
+          className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-[var(--muted)] active:scale-95 cursor-pointer"
           style={{ color: 'var(--muted-foreground)' }}
           title="Toggle dark mode"
         >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M9 1v1m0 14v1m8-8h-1M2 9H1m13.07-5.07l-.71.71M4.64 13.36l-.71.71m11.14 0l-.71-.71M4.64 4.64l-.71-.71M13 9a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+            <circle cx="12" cy="12" r="5" />
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
           </svg>
         </button>
 
-        {/* User menu */}
+        {/* User avatar menu */}
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200 hover:ring-2"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200 hover:ring-2 active:scale-95 cursor-pointer"
             style={{
-              background: 'var(--primary)',
-              color: 'var(--primary-foreground)',
+              background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+              color: '#ffffff',
               '--tw-ring-color': 'var(--ring)',
+              '--tw-ring-offset-width': '2px',
+              '--tw-ring-offset-color': 'var(--background)',
             }}
           >
             {user?.user_metadata?.full_name?.[0]?.toUpperCase() || '?'}
@@ -75,14 +117,18 @@ export default function TopBar({ user, onToggleSidebar }) {
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
               <div
-                className="absolute right-0 top-12 w-56 rounded-xl border shadow-xl z-50 py-2 animate-scale-in"
-                style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+                className="absolute right-0 top-12 w-56 rounded-2xl border shadow-xl z-50 py-1.5 animate-scale-in overflow-hidden"
+                style={{
+                  background: 'var(--card)',
+                  borderColor: 'var(--border)',
+                  boxShadow: '0 12px 40px rgba(0,0,0,0.12)',
+                }}
               >
-                <div className="px-4 py-2 border-b" style={{ borderColor: 'var(--border)' }}>
+                <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
                   <p className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>
                     {user?.user_metadata?.full_name || 'Student'}
                   </p>
-                  <p className="text-xs truncate" style={{ color: 'var(--muted-foreground)' }}>
+                  <p className="text-xs truncate mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
                     {user?.email}
                   </p>
                 </div>
@@ -91,23 +137,25 @@ export default function TopBar({ user, onToggleSidebar }) {
                     setShowMenu(false);
                     router.push('/settings');
                   }}
-                  className="w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-[var(--muted)] flex items-center gap-2"
+                  className="w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-[var(--muted)] flex items-center gap-2.5 cursor-pointer"
                   style={{ color: 'var(--foreground)' }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
                   </svg>
                   Settings
                 </button>
-                <div className="border-t" style={{ borderColor: 'var(--border)' }}></div>
+                <div className="border-t my-1" style={{ borderColor: 'var(--border)' }} />
                 <button
                   onClick={handleLogout}
-                  className="w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-[var(--muted)] flex items-center gap-2 rounded-b-xl"
+                  className="w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-[var(--muted)] flex items-center gap-2.5 cursor-pointer"
                   style={{ color: 'var(--danger)' }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3M11 11l3-3m0 0l-3-3m3 3H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
                   </svg>
                   Sign out
                 </button>
