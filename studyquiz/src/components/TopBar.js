@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase-browser';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function TopBar({ user, onToggleLibrary, libraryOpen }) {
@@ -23,13 +23,45 @@ export default function TopBar({ user, onToggleLibrary, libraryOpen }) {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   };
 
-  // Page title from pathname
-  const getPageTitle = () => {
-    const segments = pathname.split('/').filter(Boolean);
-    if (segments.length === 0) return 'Home';
-    const page = segments[segments.length - 1];
-    return page.charAt(0).toUpperCase() + page.slice(1);
-  };
+  const [pageTitle, setPageTitle] = useState('Loading...');
+
+  useEffect(() => {
+    const fetchTitle = async () => {
+      const segments = pathname.split('/').filter(Boolean);
+      if (segments.length === 0) {
+        setPageTitle('Home');
+        return;
+      }
+
+      const lastSegment = segments[segments.length - 1];
+
+      // UUID check
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+      if (uuidRegex.test(lastSegment)) {
+        let table = '';
+        let column = '';
+        if (segments[segments.length - 2] === 'subjects') { table = 'subjects'; column = 'name'; }
+        else if (segments[segments.length - 2] === 'courses') { table = 'courses'; column = 'name'; }
+        else if (segments[segments.length - 2] === 'units') { table = 'units'; column = 'title'; }
+        if (table) {
+          try {
+            const { data } = await supabase.from(table).select(column).eq('id', lastSegment).single();
+            if (data) {
+              setPageTitle(data[column]);
+              return;
+            }
+          } catch (err) {
+            console.error('Error fetching title for topbar:', err);
+          }
+        }
+      }
+
+      setPageTitle(lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1));
+    };
+
+    fetchTitle();
+  }, [pathname, supabase]);
 
   return (
     <header
@@ -77,7 +109,7 @@ export default function TopBar({ user, onToggleLibrary, libraryOpen }) {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M9 18l6-6-6-6" />
           </svg>
-          <span className="font-medium" style={{ color: 'var(--foreground)' }}>{getPageTitle()}</span>
+          <span className="font-medium" style={{ color: 'var(--foreground)' }}>{pageTitle}</span>
         </div>
       </div>
 
