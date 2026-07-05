@@ -104,18 +104,6 @@ export default function DashboardPage() {
       ),
     },
     {
-      label: 'Courses',
-      value: stats.courses,
-      color: 'var(--secondary)',
-      href: '/subjects',
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-        </svg>
-      ),
-    },
-    {
       label: 'Questions',
       value: stats.questions,
       color: 'var(--accent)',
@@ -146,8 +134,8 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6 animate-fade-in">
         <div className="h-8 w-48 rounded-2xl animate-shimmer" />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
             <div key={i} className="h-28 rounded-2xl animate-shimmer" />
           ))}
         </div>
@@ -172,7 +160,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Bento Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {statCards.map((card, i) => (
           <Link
             href={card.href || '#'}
