@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 
 export default function DashboardLayout({ children }) {
   const [user, setUser] = useState(null);
-  const [libraryOpen, setLibraryOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
 
@@ -55,21 +54,13 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background)' }}>
-      {/* Library overlay panel — no permanent sidebar */}
-      <Sidebar
-        user={user}
-        isOpen={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-      />
+    <div className="min-h-screen flex" style={{ background: 'var(--background)' }}>
+      {/* Persistent sidebar */}
+      <Sidebar user={user} />
 
-      {/* Full-width content */}
-      <div className="flex flex-col min-h-screen">
-        <TopBar
-          user={user}
-          onToggleLibrary={() => setLibraryOpen(prev => !prev)}
-          libraryOpen={libraryOpen}
-        />
+      {/* Main content area */}
+      <div className="flex flex-col flex-1 min-w-0">
+        <TopBar user={user} />
         <main className="flex-1 px-5 lg:px-10 py-6 lg:py-8 max-w-6xl mx-auto w-full">
           {children}
         </main>

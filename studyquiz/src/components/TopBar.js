@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase-browser';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-export default function TopBar({ user, onToggleLibrary, libraryOpen }) {
+export default function TopBar({ user }) {
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
@@ -71,46 +71,9 @@ export default function TopBar({ user, onToggleLibrary, libraryOpen }) {
         borderColor: 'var(--border)',
       }}
     >
-      {/* Left section: Logo + Library toggle */}
-      <div className="flex items-center gap-3">
-        {/* Graduation hat logo → navigates home */}
-        <Link
-          href="/"
-          className="flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer flex-shrink-0"
-          style={{ background: 'var(--primary)' }}
-          title="Go to Home"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-            <path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5" />
-          </svg>
-        </Link>
-
-        {/* Library toggle button — like Spotify's "Your Library" */}
-        <button
-          onClick={onToggleLibrary}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-          style={{
-            background: libraryOpen
-              ? 'color-mix(in srgb, var(--primary) 12%, transparent)'
-              : 'var(--muted)',
-            color: libraryOpen ? 'var(--primary)' : 'var(--foreground)',
-          }}
-          title="Your Library"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-          </svg>
-          <span className="hidden sm:inline">Your Library</span>
-        </button>
-
-        {/* Page breadcrumb */}
-        <div className="hidden md:flex items-center gap-1.5 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <path d="M9 18l6-6-6-6" />
-          </svg>
-          <span className="font-medium" style={{ color: 'var(--foreground)' }}>{pageTitle}</span>
-        </div>
+      {/* Left section: Page breadcrumb */}
+      <div className="flex items-center gap-2">
+        <span className="text-base font-semibold" style={{ color: 'var(--foreground)' }}>{pageTitle}</span>
       </div>
 
       {/* Right section */}
