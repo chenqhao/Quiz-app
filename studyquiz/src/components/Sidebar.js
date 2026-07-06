@@ -156,7 +156,6 @@ export default function Sidebar({ user }) {
   // Main navigation items
   const mainNav = [
     { href: '/', icon: icons.home, label: 'Home' },
-    { href: '/subjects', icon: icons.library, label: 'Your Classes' },
     { href: '/friends', icon: icons.studyGroups, label: 'Friends' },
     { href: '/inbox', icon: icons.notifications, label: 'Notifications', badge: unreadCount },
   ];
@@ -288,12 +287,12 @@ export default function Sidebar({ user }) {
             onMouseLeave={(e) => {
               e.currentTarget.style.background = 'transparent';
             }}
-            title={collapsed ? 'New class' : undefined}
+            title={collapsed ? 'Your classes' : undefined}
           >
             <span className="flex-shrink-0" style={{ opacity: 0.7 }}>
-              {icons.plus}
+              {icons.library}
             </span>
-            {!collapsed && <span className="flex-1 truncate">New class</span>}
+            {!collapsed && <span className="flex-1 truncate">Your classes</span>}
           </Link>
 
           {/* Subject list (classes) */}
