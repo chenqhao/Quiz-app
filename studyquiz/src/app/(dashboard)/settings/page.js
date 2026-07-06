@@ -72,32 +72,35 @@ export default function SettingsPage() {
     setUploadingAvatar(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const filePath = `avatars/${user.id}.${fileExt}`;
+      // Store directly as {userId}.{ext} in the avatars bucket (no subfolder)
+      const filePath = `${user.id}.${fileExt}`;
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from('Avatars')
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
+      // Get public URL with cache-busting
       const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
+        .from('Avatars')
         .getPublicUrl(filePath);
+
+      const urlWithCacheBust = `${publicUrl}?t=${Date.now()}`;
 
       // Update user metadata
       const { error: updateError } = await supabase.auth.updateUser({
-        data: { avatar_url: publicUrl },
+        data: { avatar_url: urlWithCacheBust },
       });
 
       if (updateError) throw updateError;
 
-      setAvatarUrl(publicUrl);
+      setAvatarUrl(urlWithCacheBust);
       showMessage('Profile picture updated!');
     } catch (err) {
       console.error('Avatar upload error:', err);
-      showMessage('Failed to upload picture. Make sure the "avatars" storage bucket exists.', 'error');
+      showMessage(`Failed to upload picture: ${err.message || 'Make sure the "avatars" storage bucket exists and is public.'}`, 'error');
     } finally {
       setUploadingAvatar(false);
     }
@@ -433,6 +436,48 @@ export default function SettingsPage() {
             disabled={!friendCode}
           >
             {codeCopied ? '✓ Copied!' : '📋 Copy'}
+          </button>
+        </div>
+      </div>
+
+      {/* Theme Preferences Section */}
+      <div
+        className="rounded-2xl border p-6"
+        style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
+      >
+        <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--foreground)' }}>
+          Preferences
+        </h2>
+        <p className="text-xs mb-5" style={{ color: 'var(--muted-foreground)' }}>
+          Customize the interface theme style.
+        </p>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>Theme Mode</p>
+            <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Switch between light and dark modes.</p>
+          </div>
+          <button
+            onClick={() => {
+              document.documentElement.classList.toggle('dark');
+              const isDark = document.documentElement.classList.contains('dark');
+              localStorage.setItem('theme', isDark ? 'dark' : 'light');
+              // Trigger state refresh for rendering component if needed
+              setMessage({ text: `Theme changed to ${isDark ? 'Dark' : 'Light'} Mode`, type: 'success' });
+              setTimeout(() => setMessage(null), 2000);
+            }}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-[var(--muted)] flex items-center gap-2 cursor-pointer border"
+            style={{
+              borderColor: 'var(--border)',
+              background: 'var(--card)',
+              color: 'var(--foreground)',
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <circle cx="12" cy="12" r="5" />
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+            </svg>
+            Toggle Theme
           </button>
         </div>
       </div>

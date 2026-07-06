@@ -89,19 +89,7 @@ export default function TopBar({ user }) {
 
       {/* Right section */}
       <div className="flex items-center gap-1.5">
-        {/* Dark mode toggle */}
-        <button
-          id="dark-mode-toggle"
-          onClick={toggleDarkMode}
-          className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-[var(--muted)] active:scale-95 cursor-pointer"
-          style={{ color: 'var(--muted-foreground)' }}
-          title="Toggle dark mode"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-            <circle cx="12" cy="12" r="5" />
-            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-          </svg>
-        </button>
+
 
         {/* User avatar menu */}
         <div className="relative">
