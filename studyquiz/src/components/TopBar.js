@@ -65,14 +65,25 @@ export default function TopBar({ user }) {
 
   return (
     <header
-      className="sticky top-0 z-20 flex items-center justify-between px-5 lg:px-8 glass-heavy border-b"
+      className="sticky top-0 z-20 flex items-center justify-between px-5 lg:px-3 glass-heavy border-b"
       style={{
         height: 'var(--topbar-height)',
         borderColor: 'var(--border)',
       }}
     >
-      {/* Left section: Page breadcrumb */}
-      <div className="flex items-center gap-2">
+      {/* Left section: Logo + Page breadcrumb */}
+      <div className="flex items-center gap-3">
+        <Link
+          href="/"
+          className="flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer flex-shrink-0"
+          style={{ background: 'var(--primary)' }}
+          title="Go to Home"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+            <path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5" />
+          </svg>
+        </Link>
         <span className="text-base font-semibold" style={{ color: 'var(--foreground)' }}>{pageTitle}</span>
       </div>
 

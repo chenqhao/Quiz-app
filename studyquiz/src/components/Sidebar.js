@@ -156,8 +156,8 @@ export default function Sidebar({ user }) {
   // Main navigation items
   const mainNav = [
     { href: '/', icon: icons.home, label: 'Home' },
-    { href: '/subjects', icon: icons.library, label: 'Your library' },
-    { href: '/friends', icon: icons.studyGroups, label: 'Study groups' },
+    { href: '/subjects', icon: icons.library, label: 'Your Classes' },
+    { href: '/friends', icon: icons.studyGroups, label: 'Friends' },
     { href: '/inbox', icon: icons.notifications, label: 'Notifications', badge: unreadCount },
   ];
 
@@ -206,21 +206,6 @@ export default function Sidebar({ user }) {
         >
           {icons.menu}
         </button>
-
-        {/* Logo — same as existing */}
-        {!collapsed && (
-          <Link
-            href="/"
-            className="flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer flex-shrink-0"
-            style={{ background: 'var(--primary)' }}
-            title="Go to Home"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-              <path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5" />
-            </svg>
-          </Link>
-        )}
       </div>
 
       {/* Scrollable nav area */}
