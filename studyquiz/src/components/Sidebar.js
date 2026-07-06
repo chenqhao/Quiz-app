@@ -61,17 +61,38 @@ const icons = {
       <polyline points="10 9 9 9 8 9" />
     </svg>
   ),
-  practiceTests: (
+  leaderboard: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="9 11 12 14 22 4" />
-      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7" />
+      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7" />
+      <path d="M4 22h16" />
+      <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 19.24 7 20h10c0-.76-.85-1.25-2.03-1.79C14.47 17.98 14 17.55 14 17v-2.34" />
+      <path d="M18 7.5C18 12 12 17 12 17s-6-5-6-9.5a6 6 0 0 1 12 0" />
     </svg>
   ),
-  expertSolutions: (
+  calendar: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  ),
+  settings: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  ),
+  progress: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    </svg>
+  ),
+  review: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
     </svg>
   ),
   dot: (
@@ -160,12 +181,14 @@ export default function Sidebar({ user }) {
     { href: '/inbox', icon: icons.notifications, label: 'Notifications', badge: unreadCount },
   ];
 
-  // Start here items
-  const startHere = [
-    { href: '/generate', icon: icons.flashcards, label: 'Flashcards' },
-    { href: '/review', icon: icons.studyGuides, label: 'Study Guides' },
-    { href: '/leaderboard', icon: icons.practiceTests, label: 'Practice Tests' },
-    { href: '/settings', icon: icons.expertSolutions, label: 'Expert Solutions' },
+  // Quick access items
+  const quickAccess = [
+    { href: '/generate', icon: icons.flashcards, label: 'Generate' },
+    { href: '/review', icon: icons.review, label: 'Review' },
+    { href: '/progress', icon: icons.progress, label: 'Progress' },
+    { href: '/leaderboard', icon: icons.leaderboard, label: 'Leaderboard' },
+    { href: '/calendar', icon: icons.calendar, label: 'Calendar' },
+    { href: '/settings', icon: icons.settings, label: 'Settings' },
   ];
 
   const sidebarWidth = collapsed ? 64 : 240;
@@ -351,17 +374,17 @@ export default function Sidebar({ user }) {
         {/* Divider */}
         <div className="mx-3 my-3" style={{ borderTop: '1px solid var(--sidebar-border)' }} />
 
-        {/* Start here section */}
+        {/* Quick Access section */}
         {!collapsed && (
           <div className="px-4 mb-2">
             <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
-              Start here
+              Quick Access
             </p>
           </div>
         )}
 
         <div className="px-2 space-y-0.5">
-          {startHere.map((item) => (
+          {quickAccess.map((item) => (
             <Link
               key={item.href}
               href={item.href}
