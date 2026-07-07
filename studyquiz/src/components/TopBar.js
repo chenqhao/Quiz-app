@@ -95,7 +95,7 @@ export default function TopBar({ user }) {
         <div className="relative">
           <button
             onClick={() => setShowMenu(!showMenu)}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200 hover:ring-2 active:scale-95 cursor-pointer"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200 hover:ring-2 active:scale-95 cursor-pointer overflow-hidden"
             style={{
               background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
               color: '#ffffff',
@@ -104,7 +104,11 @@ export default function TopBar({ user }) {
               '--tw-ring-offset-color': 'var(--background)',
             }}
           >
-            {user?.user_metadata?.full_name?.[0]?.toUpperCase() || '?'}
+            {user?.user_metadata?.avatar_url ? (
+              <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              user?.user_metadata?.full_name?.[0]?.toUpperCase() || '?'
+            )}
           </button>
 
           {showMenu && (
