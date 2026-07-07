@@ -336,7 +336,7 @@ export default function ProgressPage() {
             {/* Month labels row */}
             <thead>
               <tr>
-                <td style={{ width: 30 }} /> {/* Spacer for day labels */}
+                <td style={{ width: 30 }} />{/* Spacer for day labels */}
                 {weeks.map((_, wi) => {
                   const marker = monthMarkers.find((m) => m.weekIndex === wi);
                   // Don't show if too close to previous
