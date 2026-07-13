@@ -193,7 +193,7 @@ function QuizStartContent() {
         {/* Timer Configuration */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>⏱️ Quiz Timer</label>
+            <label className="text-sm font-semibold flex items-center gap-1.5" style={{ color: 'var(--foreground)' }}><Timer size={16} weight="bold" /> Quiz Timer</label>
             <button
               onClick={() => setTimerEnabled(!timerEnabled)}
               className="relative w-12 h-6 rounded-full transition-all duration-300 cursor-pointer"
@@ -254,7 +254,7 @@ function QuizStartContent() {
                     color: 'var(--accent)',
                   }}
                 >
-                  <span>⏱️</span>
+                  <Timer size={14} weight="bold" />
                   <span>
                     {timerMinutes > 0 ? `${timerMinutes}m` : ''}{timerSeconds > 0 ? ` ${timerSeconds}s` : ''} total
                     {' · '}
