@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, use } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { useRouter } from 'next/navigation';
+import { Warning, Check, Timer, CheckSquare } from '@phosphor-icons/react';
 import { TypeBadge, DifficultyBadge } from '@/components/ui/Badge';
 
 export default function ActiveQuizPage({ params }) {
@@ -214,7 +215,7 @@ export default function ActiveQuizPage({ params }) {
         }}>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <span className="text-lg">⏱️</span>
+              <Timer className="w-5 h-5" />
               <span
                 className="text-2xl font-mono font-bold tracking-wider"
                 style={{ color: getTimerColor() }}
@@ -222,9 +223,9 @@ export default function ActiveQuizPage({ params }) {
                 {formatTimer(timeRemaining)}
               </span>
             </div>
-            <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-              {timerPercentage <= 10 ? '⚠️ Almost out of time!' : timerPercentage <= 25 ? 'Hurry up!' : 'Time remaining'}
-            </span>
+            <p className="text-xs font-semibold flex items-center gap-1.5" style={{ color: timerPercentage <= 10 ? 'var(--danger)' : 'var(--muted-foreground)' }}>
+              {timerPercentage <= 10 ? <><Warning weight="fill" /> Almost out of time!</> : timerPercentage <= 25 ? 'Hurry up!' : 'Time remaining'}
+            </p>
           </div>
           <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--muted)' }}>
             <div
@@ -272,7 +273,7 @@ export default function ActiveQuizPage({ params }) {
           <div className="space-y-3">
             {currentQ.is_multi_select && (
               <p className="text-xs font-medium px-1 flex items-center gap-1.5" style={{ color: 'var(--accent)' }}>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="2" y="2" width="10" height="10" rx="2"/><path d="M4.5 7l2 2 3-3.5"/></svg>
+                <CheckSquare className="w-4 h-4" />
                 Select all correct answers
               </p>
             )}
@@ -321,7 +322,7 @@ export default function ActiveQuizPage({ params }) {
                           color: isSelected ? 'var(--primary-foreground)' : 'transparent',
                         }}
                       >
-                        {isSelected && '✓'}
+                        {isSelected && <Check weight="bold" />}
                       </span>
                     ) : (
                       <span className="font-bold" style={{ color: 'var(--muted-foreground)' }}>{String.fromCharCode(65 + ci)}.</span>

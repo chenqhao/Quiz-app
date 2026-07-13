@@ -1,0 +1,4 @@
+# Agent config files
+.agents/
+AGENTS.md
+CLAUDE.md

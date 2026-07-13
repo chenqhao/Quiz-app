@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { Target, Timer } from '@phosphor-icons/react';
 
 function QuizStartContent() {
   const supabase = createClient();
@@ -124,8 +125,8 @@ function QuizStartContent() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-4">
-          <span className="text-3xl">🎯</span>
+        <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-6" style={{ background: 'color-mix(in srgb, var(--primary) 15%, transparent)' }}>
+          <span className="text-3xl flex items-center justify-center text-[var(--primary)]"><Target weight="fill" size={32} /></span>
         </div>
         <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>Start a Quiz</h1>
         <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>Configure your quiz and test your knowledge</p>

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { createClient } from '@/lib/supabase-browser';
+import { Fire, CalendarBlank, CheckCircle, Target, Timer, ChartBar, TrendUp, Books } from '@phosphor-icons/react';
 
 // ── Helpers ──────────────────────────────────────────────────────
 function formatTime(seconds) {
@@ -438,42 +439,42 @@ export default function ProgressPage() {
             value: `${stats.currentStreak}`,
             unit: stats.currentStreak === 1 ? 'day' : 'days',
             color: 'var(--danger)',
-            icon: '🔥',
+            icon: <Fire weight="fill" />,
           },
           {
             label: 'Longest Streak',
             value: `${stats.longestStreak}`,
             unit: stats.longestStreak === 1 ? 'day' : 'days',
             color: 'var(--warning)',
-            icon: '📅',
+            icon: <CalendarBlank weight="fill" />,
           },
           {
             label: 'Questions Answered',
             value: stats.totalQuestions.toLocaleString(),
             unit: '',
             color: 'var(--primary)',
-            icon: '✅',
+            icon: <CheckCircle weight="fill" />,
           },
           {
             label: 'Accuracy',
             value: `${accuracy}`,
             unit: '%',
             color: 'var(--success)',
-            icon: '🎯',
+            icon: <Target weight="fill" />,
           },
           {
             label: 'Study Time',
             value: formatTime(stats.totalTime),
             unit: '',
             color: 'var(--secondary)',
-            icon: '⏱️',
+            icon: <Timer weight="fill" />,
           },
           {
             label: 'Quizzes Taken',
             value: stats.totalQuizzes.toLocaleString(),
             unit: '',
             color: 'var(--accent)',
-            icon: '📊',
+            icon: <ChartBar weight="fill" />,
           },
         ].map((card, i) => (
           <div
@@ -517,7 +518,7 @@ export default function ProgressPage() {
           </h2>
           {monthlyTrend.length === 0 || monthlyTrend.every((m) => m.count === 0) ? (
             <div className="py-8 text-center">
-              <span className="text-4xl mb-3 block">📈</span>
+              <span className="mb-3 flex justify-center text-[var(--muted-foreground)] opacity-50"><TrendUp weight="regular" size={48} /></span>
               <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
                 Take quizzes to see your monthly trends.
               </p>
@@ -562,7 +563,7 @@ export default function ProgressPage() {
           </h2>
           {subjectBreakdown.length === 0 ? (
             <div className="py-8 text-center">
-              <span className="text-4xl mb-3 block">📚</span>
+              <span className="mb-3 flex justify-center text-[var(--muted-foreground)] opacity-50"><Books weight="regular" size={48} /></span>
               <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
                 Complete quizzes across subjects to see your breakdown.
               </p>

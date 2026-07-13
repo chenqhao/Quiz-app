@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Quizzard — Apple-Inspired Design System
-   Clean, minimal, premium feel with Bento grid aesthetic
+   Quizzard — Apple Liquid Glass Design System (HIG)
+   Authentic translucency, specular highlights, vibrancy,
+   four glass material tiers, SF Pro type scale
    ============================================================ */
 
 @theme inline {
@@ -31,40 +32,43 @@
   --color-sidebar-accent: var(--sidebar-accent);
   --color-ring: var(--ring);
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
 }
 
-/* ---- Light Mode — Apple-inspired neutrals ---- */
+/* ============================================================
+   Light Mode — Apple System Colors (iOS/macOS 26)
+   ============================================================ */
+
 :root {
-  --background: #f5f5f7;
-  --foreground: #1d1d1f;
+  --background: #f2f2f7;
+  --foreground: #1c1c1e;
   --card: #ffffff;
-  --card-foreground: #1d1d1f;
-  --muted: #f0f0f2;
-  --muted-foreground: #86868b;
-  --border: #e8e8ed;
-  --primary: #0071e3;
+  --card-foreground: #1c1c1e;
+  --muted: #e5e5ea;
+  --muted-foreground: #8e8e93;
+  --border: rgba(60, 60, 67, 0.12);
+  --primary: #007aff;
   --primary-foreground: #ffffff;
   --secondary: #5856d6;
   --secondary-foreground: #ffffff;
   --accent: #007aff;
   --accent-foreground: #ffffff;
-  --success: #30d158;
+  --success: #34c759;
   --success-foreground: #ffffff;
   --danger: #ff3b30;
   --danger-foreground: #ffffff;
-  --warning: #ff9f0a;
+  --warning: #ff9500;
   --warning-foreground: #ffffff;
-  --sidebar: #fbfbfd;
-  --sidebar-foreground: #1d1d1f;
-  --sidebar-border: #e8e8ed;
-  --sidebar-accent: #f0f0f2;
-  --ring: #0071e3;
+  --sidebar: rgba(255, 255, 255, 0.65);
+  --sidebar-foreground: #1c1c1e;
+  --sidebar-border: rgba(60, 60, 67, 0.1);
+  --sidebar-accent: rgba(120, 120, 128, 0.08);
+  --ring: rgba(0, 122, 255, 0.4);
 
-  /* Apple spacing scale */
+  /* ---- Apple Spacing Scale ---- */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
@@ -73,25 +77,120 @@
   --space-2xl: 48px;
   --space-3xl: 64px;
 
-  /* Bento card tokens */
-  --card-radius: 20px;
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  --card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+  /* ---- Superellipse Corner Radii ---- */
+  --card-radius: 22px;
+
+  /* ---- SF Pro Typography Scale ---- */
+  --type-largetitle: 2.125rem;
+  /* 34px */
+  --type-title1: 1.75rem;
+  /* 28px */
+  --type-title2: 1.375rem;
+  /* 22px */
+  --type-title3: 1.25rem;
+  /* 20px */
+  --type-headline: 1.0625rem;
+  /* 17px semibold */
+  --type-body: 1.0625rem;
+  /* 17px */
+  --type-callout: 1rem;
+  /* 16px */
+  --type-subhead: 0.9375rem;
+  /* 15px */
+  --type-footnote: 0.8125rem;
+  /* 13px */
+  --type-caption1: 0.75rem;
+  /* 12px */
+  --type-caption2: 0.6875rem;
+  /* 11px */
+
+  /* ---- Liquid Glass Material Tiers ---- */
+
+  /* Ultra-thin: ambient chrome, subtle overlays */
+  --glass-ultra-thin-bg: rgba(255, 255, 255, 0.35);
+  --glass-ultra-thin-blur: blur(16px) saturate(150%);
+  --glass-ultra-thin-border: rgba(255, 255, 255, 0.3);
+
+  /* Regular: cards, panels, content surfaces */
+  --glass-regular-bg: rgba(255, 255, 255, 0.55);
+  --glass-regular-blur: blur(24px) saturate(180%);
+  --glass-regular-border: rgba(255, 255, 255, 0.45);
+
+  /* Thick: elevated surfaces, popovers, sheets */
+  --glass-thick-bg: rgba(255, 255, 255, 0.72);
+  --glass-thick-blur: blur(40px) saturate(190%);
+  --glass-thick-border: rgba(255, 255, 255, 0.5);
+
+  /* Chrome: system bars — sidebar, top bar */
+  --glass-chrome-bg: rgba(245, 245, 247, 0.72);
+  --glass-chrome-blur: blur(50px) saturate(200%);
+  --glass-chrome-border: rgba(255, 255, 255, 0.35);
+
+  /* ---- Specular Highlight System ---- */
+  --specular-top: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.65) 0%,
+      rgba(255, 255, 255, 0.15) 30%,
+      transparent 60%);
+  --specular-edge: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.6) 15%,
+      rgba(255, 255, 255, 0.6) 85%,
+      transparent 100%);
+  --specular-inner: inset 0 0.5px 0 0 rgba(255, 255, 255, 0.65);
+
+  /* ---- Multi-Layer Shadow System ---- */
+  --shadow-sm:
+    0 0.5px 0 0 rgba(255, 255, 255, 0.5) inset,
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 0.5px 1px rgba(0, 0, 0, 0.03);
+  --shadow-md:
+    0 0.5px 0 0 rgba(255, 255, 255, 0.5) inset,
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg:
+    0 0.5px 0 0 rgba(255, 255, 255, 0.5) inset,
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-xl:
+    0 0.5px 0 0 rgba(255, 255, 255, 0.5) inset,
+    0 16px 48px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.06);
+
+  /* ---- Legacy compat tokens ---- */
+  --glass-bg: var(--glass-regular-bg);
+  --glass-bg-heavy: var(--glass-chrome-bg);
+  --glass-border: var(--glass-regular-border);
+  --glass-highlight: rgba(255, 255, 255, 0.6);
+  --glass-shadow: var(--shadow-md);
+  --glass-inner-shadow: var(--specular-inner);
+  --glass-blur: var(--glass-regular-blur);
+  --glass-blur-heavy: var(--glass-chrome-blur);
+  --card-shadow: var(--shadow-md);
+  --card-shadow-hover: var(--shadow-lg);
   --card-padding: 24px;
 
   /* Top bar height */
   --topbar-height: 56px;
+
+  /* ---- Mesh Gradient Background ---- */
+  --mesh-1: #b6d0f7;
+  --mesh-2: #c3b8f0;
+  --mesh-3: #b5e3d8;
+  --mesh-4: #f0d6b8;
 }
 
-/* ---- Dark Mode — Apple-style dark ---- */
+/* ============================================================
+   Dark Mode — Apple System Colors (iOS/macOS 26)
+   ============================================================ */
+
 .dark {
   --background: #000000;
   --foreground: #f5f5f7;
-  --card: #1c1c1e;
+  --card: rgba(28, 28, 30, 0.9);
   --card-foreground: #f5f5f7;
   --muted: #2c2c2e;
   --muted-foreground: #98989d;
-  --border: #38383a;
+  --border: rgba(84, 84, 88, 0.36);
   --primary: #0a84ff;
   --primary-foreground: #ffffff;
   --secondary: #5e5ce6;
@@ -103,15 +202,77 @@
   --danger: #ff453a;
   --danger-foreground: #ffffff;
   --warning: #ffd60a;
-  --warning-foreground: #1d1d1f;
-  --sidebar: #1c1c1e;
+  --warning-foreground: #1c1c1e;
+  --sidebar: rgba(28, 28, 30, 0.65);
   --sidebar-foreground: #f5f5f7;
-  --sidebar-border: #38383a;
-  --sidebar-accent: #2c2c2e;
-  --ring: #0a84ff;
+  --sidebar-border: rgba(84, 84, 88, 0.25);
+  --sidebar-accent: rgba(120, 120, 128, 0.16);
+  --ring: rgba(10, 132, 255, 0.4);
 
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
+  /* Dark glass tiers */
+  --glass-ultra-thin-bg: rgba(28, 28, 30, 0.35);
+  --glass-ultra-thin-blur: blur(16px) saturate(150%);
+  --glass-ultra-thin-border: rgba(255, 255, 255, 0.05);
+
+  --glass-regular-bg: rgba(38, 38, 40, 0.55);
+  --glass-regular-blur: blur(24px) saturate(180%);
+  --glass-regular-border: rgba(255, 255, 255, 0.08);
+
+  --glass-thick-bg: rgba(44, 44, 46, 0.72);
+  --glass-thick-blur: blur(40px) saturate(190%);
+  --glass-thick-border: rgba(255, 255, 255, 0.1);
+
+  --glass-chrome-bg: rgba(22, 22, 24, 0.78);
+  --glass-chrome-blur: blur(50px) saturate(200%);
+  --glass-chrome-border: rgba(255, 255, 255, 0.06);
+
+  /* Dark specular — much subtler */
+  --specular-top: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.02) 30%,
+      transparent 60%);
+  --specular-edge: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.06) 15%,
+      rgba(255, 255, 255, 0.06) 85%,
+      transparent 100%);
+  --specular-inner: inset 0 0.5px 0 0 rgba(255, 255, 255, 0.08);
+
+  /* Dark shadows — deeper */
+  --shadow-sm:
+    0 0.5px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 1px 2px rgba(0, 0, 0, 0.25),
+    0 0.5px 1px rgba(0, 0, 0, 0.15);
+  --shadow-md:
+    0 0.5px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    0 1px 4px rgba(0, 0, 0, 0.2);
+  --shadow-lg:
+    0 0.5px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-xl:
+    0 0.5px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 16px 48px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.25);
+
+  /* Legacy compat */
+  --glass-bg: var(--glass-regular-bg);
+  --glass-bg-heavy: var(--glass-chrome-bg);
+  --glass-border: var(--glass-regular-border);
+  --glass-highlight: rgba(255, 255, 255, 0.06);
+  --glass-shadow: var(--shadow-md);
+  --glass-inner-shadow: var(--specular-inner);
+  --glass-blur: var(--glass-regular-blur);
+  --glass-blur-heavy: var(--glass-chrome-blur);
+  --card-shadow: var(--shadow-md);
+  --card-shadow-hover: var(--shadow-lg);
+
+  /* Mesh gradient — dark mode */
+  --mesh-1: #1a2744;
+  --mesh-2: #281e3d;
+  --mesh-3: #1a3129;
+  --mesh-4: #3d2a1a;
 }
 
 /* ============================================================
@@ -129,8 +290,11 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    text-rendering: optimizeLegibility;
+    transition: background-color 0.4s ease, color 0.4s ease;
     letter-spacing: -0.01em;
+    line-height: 1.47;
+    font-size: var(--type-body);
   }
 
   ::selection {
@@ -138,101 +302,337 @@
     color: var(--foreground);
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     letter-spacing: -0.025em;
     font-weight: 700;
+    line-height: 1.15;
   }
 }
 
 /* ============================================================
-   Animations — Smooth, Apple-like
+   HIG Typography Utility Classes
+   ============================================================ */
+
+.type-largetitle {
+  font-size: var(--type-largetitle);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.type-title1 {
+  font-size: var(--type-title1);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.type-title2 {
+  font-size: var(--type-title2);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.type-title3 {
+  font-size: var(--type-title3);
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  line-height: 1.25;
+}
+
+.type-headline {
+  font-size: var(--type-headline);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.type-body {
+  font-size: var(--type-body);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.47;
+}
+
+.type-callout {
+  font-size: var(--type-callout);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.type-subhead {
+  font-size: var(--type-subhead);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.type-footnote {
+  font-size: var(--type-footnote);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  line-height: 1.35;
+}
+
+.type-caption1 {
+  font-size: var(--type-caption1);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+
+.type-caption2 {
+  font-size: var(--type-caption2);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   Animations — Apple Spring-Based & Fluid
    ============================================================ */
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-16px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes slideInRight {
-  from { opacity: 0; transform: translateX(16px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes slideOverlayIn {
-  from { opacity: 0; transform: translateX(-100%); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes slideOverlayOut {
-  from { opacity: 1; transform: translateX(0); }
-  to { opacity: 0; transform: translateX(-100%); }
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
 }
 
 @keyframes overlayFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent); }
-  70% { box-shadow: 0 0 0 8px transparent; }
-  100% { box-shadow: 0 0 0 0 transparent; }
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent);
+  }
+
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes progressFill {
-  from { width: 0%; }
+  from {
+    width: 0%;
+  }
+}
+
+/* Liquid Glass material transition */
+@keyframes glassMorph {
+  0% {
+    backdrop-filter: blur(12px) saturate(100%);
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  100% {
+    backdrop-filter: blur(24px) saturate(180%);
+    background: var(--glass-regular-bg);
+  }
+}
+
+/* Depth press — haptic-like feedback */
+@keyframes depthPress {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.97);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Vibrancy pulse — attention draw */
+@keyframes vibrancyPulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Liquid shimmer across glass surface */
+@keyframes liquidShimmer {
+  0% {
+    background-position: -200% 50%;
+  }
+
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+/* Subtle ambient mesh animation */
+@keyframes meshDrift {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -20px) rotate(120deg) scale(1.05);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) rotate(240deg) scale(0.95);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(360deg) scale(1);
+  }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: fadeIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: slideUp 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: scaleIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 .animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--muted) 25%,
-    color-mix(in srgb, var(--muted) 50%, var(--card)) 50%,
-    var(--muted) 75%
-  );
+  background: linear-gradient(90deg,
+      var(--muted) 25%,
+      color-mix(in srgb, var(--muted) 50%, var(--card)) 50%,
+      var(--muted) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
 
 /* ============================================================
-   Scrollbar — Minimal Apple-style
+   Scrollbar — Ultra-minimal Apple style
    ============================================================ */
 
 ::-webkit-scrollbar {
@@ -245,31 +645,77 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--muted-foreground) 30%, transparent);
+  background: color-mix(in srgb, var(--muted-foreground) 25%, transparent);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--muted-foreground) 50%, transparent);
+  background: color-mix(in srgb, var(--muted-foreground) 40%, transparent);
 }
 
 /* ============================================================
-   Utilities
+   Liquid Glass Material Utilities
    ============================================================ */
 
 @layer utilities {
-  .glass {
-    background: color-mix(in srgb, var(--card) 80%, transparent);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+  /* ---- Glass Tier: Ultra-thin ---- */
+  .glass-ultra-thin {
+    background: var(--glass-ultra-thin-bg);
+    backdrop-filter: var(--glass-ultra-thin-blur);
+    -webkit-backdrop-filter: var(--glass-ultra-thin-blur);
+    border: 0.5px solid var(--glass-ultra-thin-border);
+    box-shadow: var(--shadow-sm);
   }
 
-  .glass-heavy {
-    background: color-mix(in srgb, var(--background) 72%, transparent);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
+  /* ---- Glass Tier: Regular ---- */
+  .glass,
+  .glass-regular {
+    background: var(--glass-regular-bg);
+    backdrop-filter: var(--glass-regular-blur);
+    -webkit-backdrop-filter: var(--glass-regular-blur);
+    border: 0.5px solid var(--glass-regular-border);
+    box-shadow: var(--specular-inner), var(--shadow-md);
   }
 
+  /* ---- Glass Tier: Thick ---- */
+  .glass-thick {
+    background: var(--glass-thick-bg);
+    backdrop-filter: var(--glass-thick-blur);
+    -webkit-backdrop-filter: var(--glass-thick-blur);
+    border: 0.5px solid var(--glass-thick-border);
+    box-shadow: var(--specular-inner), var(--shadow-lg);
+  }
+
+  /* ---- Glass Tier: Chrome (system bars) ---- */
+  .glass-heavy,
+  .glass-chrome {
+    background: var(--glass-chrome-bg);
+    backdrop-filter: var(--glass-chrome-blur);
+    -webkit-backdrop-filter: var(--glass-chrome-blur);
+    border: 0.5px solid var(--glass-chrome-border);
+    box-shadow: var(--specular-inner), var(--shadow-md);
+  }
+
+  /* ---- Specular Edge Overlay ---- */
+  .specular-edge {
+    position: relative;
+  }
+
+  .specular-edge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--specular-edge);
+    pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  /* ---- Gradients ---- */
   .gradient-primary {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
   }
@@ -281,41 +727,115 @@
     background-clip: text;
   }
 
-  /* Apple-style hover lift — subtle */
+  /* ---- Hover Lift — glass float effect ---- */
   .hover-lift {
-    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition:
+      transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .hover-lift:hover {
     transform: translateY(-2px) scale(1.005);
-    box-shadow: var(--card-shadow-hover);
+    box-shadow: var(--shadow-lg);
   }
 
-  /* Bento card base */
+  /* ---- Depth Press — active/tap state ---- */
+  .depth-press:active {
+    transform: scale(0.97);
+    transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* ============================================================
+     Liquid Glass — Bento Card
+     ============================================================ */
+
+  .glass-card,
   .bento-card {
-    background: var(--card);
+    background: var(--glass-regular-bg);
+    backdrop-filter: var(--glass-regular-blur);
+    -webkit-backdrop-filter: var(--glass-regular-blur);
     border-radius: var(--card-radius);
-    box-shadow: var(--card-shadow);
+    border: 0.5px solid var(--glass-regular-border);
+    box-shadow: var(--specular-inner), var(--shadow-md);
     padding: var(--card-padding);
-    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+    transition:
+      transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+      border-color 0.4s ease,
+      background 0.4s ease;
   }
 
+  /* Specular highlight — top edge shine */
+  .glass-card::before,
+  .bento-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--specular-edge);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .glass-card:hover,
   .bento-card:hover {
-    box-shadow: var(--card-shadow-hover);
+    box-shadow:
+      var(--specular-inner),
+      0 8px 32px rgba(0, 0, 0, 0.08),
+      0 2px 8px rgba(0, 0, 0, 0.04);
+    border-color: color-mix(in srgb, var(--glass-regular-border) 100%, rgba(255, 255, 255, 0.2));
   }
 
   .bento-card-interactive:hover {
-    transform: scale(1.01);
-    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow:
+      var(--specular-inner),
+      0 12px 40px rgba(0, 0, 0, 0.1),
+      0 4px 12px rgba(0, 0, 0, 0.05);
   }
 
-  /* Stagger delays */
-  .stagger-1 { animation-delay: 0.05s; }
-  .stagger-2 { animation-delay: 0.1s; }
-  .stagger-3 { animation-delay: 0.15s; }
-  .stagger-4 { animation-delay: 0.2s; }
-  .stagger-5 { animation-delay: 0.25s; }
-  .stagger-6 { animation-delay: 0.3s; }
+  .bento-card-interactive:active {
+    transform: scale(0.98);
+    transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .glass-card-strong,
+  .bento-card-strong {
+    background: var(--glass-thick-bg);
+    backdrop-filter: var(--glass-thick-blur);
+    -webkit-backdrop-filter: var(--glass-thick-blur);
+    border: 0.5px solid var(--glass-thick-border);
+    box-shadow: var(--specular-inner), var(--shadow-lg);
+  }
+
+  /* Stagger delays for cascade animations */
+  .stagger-1 {
+    animation-delay: 0.05s;
+  }
+
+  .stagger-2 {
+    animation-delay: 0.1s;
+  }
+
+  .stagger-3 {
+    animation-delay: 0.15s;
+  }
+
+  .stagger-4 {
+    animation-delay: 0.2s;
+  }
+
+  .stagger-5 {
+    animation-delay: 0.25s;
+  }
+
+  .stagger-6 {
+    animation-delay: 0.3s;
+  }
 }
 
 /* ============================================================
@@ -323,18 +843,41 @@
    ============================================================ */
 
 @keyframes timerPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
 }
 
 @keyframes timerCritical {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.02); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.02);
+  }
 }
 
 @keyframes timerGlow {
-  0%, 100% { box-shadow: 0 0 8px color-mix(in srgb, var(--danger) 30%, transparent); }
-  50% { box-shadow: 0 0 20px color-mix(in srgb, var(--danger) 60%, transparent); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px color-mix(in srgb, var(--danger) 25%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 20px color-mix(in srgb, var(--danger) 50%, transparent);
+  }
 }
 
 .timer-warning {
@@ -350,8 +893,15 @@
    ============================================================ */
 
 @keyframes rankSlideIn {
-  from { opacity: 0; transform: translateX(-12px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .animate-rank-slide {
@@ -375,19 +925,34 @@
 
 /* Copy button flash */
 @keyframes copyFlash {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.15); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.12);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .copy-flash {
-  animation: copyFlash 0.3s ease-out;
+  animation: copyFlash 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Badge pulse for unread mail */
+/* Badge pulse for unread */
 @keyframes badgePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.15);
+  }
 }
 
 .badge-pulse {
@@ -403,26 +968,508 @@
 }
 
 .library-panel {
-  animation: slideOverlayIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: slideOverlayIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 .library-panel-closing {
-  animation: slideOverlayOut 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: slideOverlayOut 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 /* ============================================================
-   Apple-style section headers
+   HIG Section Headers
    ============================================================ */
 
 .section-header {
-  font-size: 1.375rem;
+  font-size: var(--type-title2);
   font-weight: 700;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
   color: var(--foreground);
+  line-height: 1.2;
 }
 
 .section-subtitle {
-  font-size: 0.875rem;
+  font-size: var(--type-footnote);
   color: var(--muted-foreground);
   margin-top: 2px;
 }
+
+/* ============================================================
+   Liquid Glass — Sidebar (Chrome Tier)
+   ============================================================ */
+
+.sidebar-container {
+  background: var(--glass-chrome-bg) !important;
+  backdrop-filter: var(--glass-chrome-blur);
+  -webkit-backdrop-filter: var(--glass-chrome-blur);
+  border-right: 0.5px solid var(--glass-chrome-border) !important;
+  box-shadow:
+    var(--specular-inner),
+    4px 0 24px rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+/* Specular right edge — light catching the panel edge */
+.sidebar-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 1px;
+  background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.3) 20%,
+      rgba(255, 255, 255, 0.3) 80%,
+      transparent 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Sidebar nav items — glass hover swell */
+.sidebar-nav-item {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.sidebar-nav-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  opacity: 0;
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.sidebar-nav-item:hover::before {
+  opacity: 1;
+}
+
+/* Active item — pill-shaped glass indicator */
+.sidebar-nav-active {
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar-nav-active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primary) 12%, var(--glass-ultra-thin-bg));
+  backdrop-filter: blur(12px) saturate(160%);
+  border: 0.5px solid color-mix(in srgb, var(--primary) 15%, transparent);
+  box-shadow:
+    inset 0 0.5px 0 0 color-mix(in srgb, var(--primary) 20%, rgba(255, 255, 255, 0.3)),
+    0 1px 4px color-mix(in srgb, var(--primary) 10%, transparent);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ============================================================
+   Liquid Glass — Inputs & Form Controls
+   ============================================================ */
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="url"],
+textarea,
+select {
+  background: var(--glass-ultra-thin-bg) !important;
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 0.5px solid var(--glass-regular-border) !important;
+  box-shadow: var(--specular-inner);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: 12px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary) !important;
+  box-shadow:
+    var(--specular-inner),
+    0 0 0 4px color-mix(in srgb, var(--primary) 12%, transparent) !important;
+  outline: none;
+}
+
+/* ============================================================
+   Liquid Glass — Buttons
+   ============================================================ */
+
+/* Primary action buttons get a glass sheen overlay */
+button[type="submit"],
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+button[type="submit"]::after,
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      transparent 100%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ============================================================
+   Liquid Glass — Dropdowns & Popovers
+   ============================================================ */
+
+[class*="absolute"][class*="rounded-2xl"][class*="shadow"] {
+  background: var(--glass-thick-bg) !important;
+  backdrop-filter: var(--glass-thick-blur) !important;
+  -webkit-backdrop-filter: var(--glass-thick-blur) !important;
+  border: 0.5px solid var(--glass-thick-border) !important;
+  box-shadow:
+    var(--specular-inner),
+    var(--shadow-xl) !important;
+}
+
+/* ============================================================
+   Liquid Glass — Muted Containers (quiz items, weak units)
+   ============================================================ */
+
+[style*="background: var(--muted)"] {
+  background: color-mix(in srgb, var(--muted) 50%, transparent) !important;
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 0.5px solid color-mix(in srgb, var(--border) 40%, transparent);
+  box-shadow: var(--specular-inner);
+}
+
+/* ============================================================
+   Liquid Glass — Auth Cards
+   ============================================================ */
+
+.auth-glass-card {
+  background: var(--glass-regular-bg);
+  backdrop-filter: var(--glass-regular-blur);
+  -webkit-backdrop-filter: var(--glass-regular-blur);
+  border: 0.5px solid var(--glass-regular-border);
+  box-shadow: var(--specular-inner), var(--shadow-lg);
+}
+
+/* Decorative blobs — softer, larger */
+[class*="blur-3xl"] {
+  filter: blur(100px);
+  opacity: 0.2;
+}
+
+.dark [class*="blur-3xl"] {
+  opacity: 0.08;
+}
+
+/* ============================================================
+   Dark mode: deeper glass on bento cards
+   ============================================================ */
+
+.dark .glass-card,
+.dark .bento-card {
+  background: var(--glass-regular-bg);
+  border-color: var(--glass-regular-border);
+}
+
+.dark .glass-card::before,
+.dark .bento-card::before {
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.03) 20%,
+      rgba(255, 255, 255, 0.03) 80%,
+      transparent 100%);
+}
+
+.dark .glass-card:hover,
+.dark .bento-card:hover {
+  background: color-mix(in srgb, var(--glass-regular-bg) 100%, rgba(255, 255, 255, 0.02));
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark .sidebar-container {
+  box-shadow:
+    var(--specular-inner),
+    4px 0 24px rgba(0, 0, 0, 0.2);
+}
+
+.dark .sidebar-container::after {
+  background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.04) 20%,
+      rgba(255, 255, 255, 0.04) 80%,
+      transparent 100%);
+}
+
+/* ============================================================
+   Liquid Glass — Modal / Dialog (HIG Sheet)
+   ============================================================ */
+
+.glass-modal-backdrop {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+}
+
+.glass-modal-panel {
+  background: var(--glass-thick-bg) !important;
+  backdrop-filter: var(--glass-thick-blur) !important;
+  -webkit-backdrop-filter: var(--glass-thick-blur) !important;
+  border: 0.5px solid var(--glass-thick-border) !important;
+  box-shadow:
+    var(--specular-inner),
+    var(--shadow-xl) !important;
+}
+
+/* ============================================================
+   Liquid Glass — Badge Pills
+   ============================================================ */
+
+.glass-badge {
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 0.5px solid var(--glass-ultra-thin-border);
+  box-shadow: var(--specular-inner);
+  position: relative;
+}
+
+/* Specular top edge on badges */
+.glass-badge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 4px;
+  right: 4px;
+  height: 0.5px;
+  background: var(--specular-edge);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ============================================================
+   Liquid Glass — Progress Bars
+   ============================================================ */
+
+[class*="h-1.5"][class*="rounded-full"][class*="overflow-hidden"] {
+  background: color-mix(in srgb, var(--border) 40%, transparent) !important;
+  backdrop-filter: blur(4px);
+  box-shadow: var(--specular-inner);
+}
+
+/* ============================================================
+   Liquid Glass — Top Bar (Chrome Tier)
+   ============================================================ */
+
+header.glass-heavy,
+header.glass-chrome,
+header[class*="glass-heavy"],
+header[class*="glass-chrome"] {
+  position: relative;
+}
+
+header.glass-heavy::after,
+header.glass-chrome::after,
+header[class*="glass-heavy"]::after,
+header[class*="glass-chrome"]::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--specular-edge);
+  pointer-events: none;
+}
+
+/* ============================================================
+   Liquid Glass — Empty State Icons
+   ============================================================ */
+
+[class*="w-20"][class*="h-20"][class*="rounded-2xl"],
+[class*="w-12"][class*="h-12"][class*="rounded-2xl"] {
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 0.5px solid var(--glass-ultra-thin-border);
+  box-shadow: var(--specular-inner);
+}
+
+/* ============================================================
+   Liquid Glass — Stat Icon Containers
+   ============================================================ */
+
+[class*="w-10"][class*="h-10"][class*="rounded-2xl"],
+[class*="w-12"][class*="h-12"][class*="rounded-2xl"] {
+  position: relative;
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  box-shadow: var(--specular-inner);
+}
+
+/* ============================================================
+   Animated Mesh Gradient Background
+   ============================================================ */
+
+.mesh-gradient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mesh-gradient-bg::before,
+.mesh-gradient-bg::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.35;
+}
+
+.mesh-gradient-bg::before {
+  width: 55%;
+  height: 55%;
+  top: -12%;
+  right: -10%;
+  background: radial-gradient(circle, var(--mesh-1) 0%, transparent 70%);
+  animation: meshDrift 30s ease-in-out infinite;
+}
+
+.mesh-gradient-bg::after {
+  width: 50%;
+  height: 50%;
+  bottom: -10%;
+  left: -8%;
+  background: radial-gradient(circle, var(--mesh-2) 0%, transparent 70%);
+  animation: meshDrift 35s ease-in-out infinite reverse;
+}
+
+.mesh-gradient-orb-1 {
+  position: absolute;
+  width: 40%;
+  height: 40%;
+  top: 30%;
+  left: 25%;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.25;
+  background: radial-gradient(circle, var(--mesh-3) 0%, transparent 70%);
+  animation: meshDrift 40s ease-in-out infinite;
+  animation-delay: -10s;
+}
+
+.mesh-gradient-orb-2 {
+  position: absolute;
+  width: 35%;
+  height: 35%;
+  top: 50%;
+  right: 15%;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.2;
+  background: radial-gradient(circle, var(--mesh-4) 0%, transparent 70%);
+  animation: meshDrift 45s ease-in-out infinite;
+  animation-delay: -20s;
+}
+
+.dark .mesh-gradient-bg::before,
+.dark .mesh-gradient-bg::after {
+  opacity: 0.15;
+}
+
+.dark .mesh-gradient-orb-1,
+.dark .mesh-gradient-orb-2 {
+  opacity: 0.1;
+}
+
+/* ============================================================
+   Smooth Transitions for All Interactive Elements
+   ============================================================ */
+
+a,
+button,
+input,
+textarea,
+select {
+  transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ============================================================
+   HIG Grouped List — Settings Sections
+   ============================================================ */
+
+.hig-grouped-section {
+  background: var(--glass-regular-bg);
+  backdrop-filter: var(--glass-regular-blur);
+  -webkit-backdrop-filter: var(--glass-regular-blur);
+  border: 0.5px solid var(--glass-regular-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--specular-inner), var(--shadow-md);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hig-grouped-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--specular-edge);
+  pointer-events: none;
+}
+
+/* ============================================================
+   Glass Segmented Control (Light/Dark toggle)
+   ============================================================ */
+
+.glass-segmented {
+  display: inline-flex;
+  background: var(--glass-ultra-thin-bg);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 0.5px solid var(--glass-ultra-thin-border);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 2px;
+  box-shadow: var(--specular-inner);
+}
+
+.glass-segmented-item {
+  padding: 6px 16px;
+  border-radius: 10px;
+  font-size: var(--type-footnote);
+  font-weight: 500;
+  color: var(--muted-foreground);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.glass-segmented-item:hover {
+  color: var(--foreground);
+}
+
+.glass-segmented-item-active {
+  background: var(--glass-regular-bg);
+  color: var(--foreground);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+}
+

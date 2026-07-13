@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-browser';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
-export default function LoginPage() {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -15,8 +15,8 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
+    setError(null);
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
@@ -25,125 +25,94 @@ export default function LoginPage() {
       setLoading(false);
     } else {
       router.push('/');
-      router.refresh();
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--background)' }}>
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full opacity-20 blur-3xl" style={{ background: 'var(--primary)' }} />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full opacity-15 blur-3xl" style={{ background: 'var(--secondary)' }} />
+    <div className="min-h-screen flex items-center justify-center p-4 relative" style={{ background: 'var(--background)' }}>
+      {/* Mesh Gradient Background */}
+      <div className="mesh-gradient-bg">
+        <div className="mesh-gradient-orb-1" />
+        <div className="mesh-gradient-orb-2" />
       </div>
 
-      <div className="w-full max-w-md animate-fade-in relative z-10">
-        {/* Logo */}
+      <div className="w-full max-w-md relative z-10 animate-slide-up">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-4 shadow-lg">
-            <span className="text-3xl">🎓</span>
+          <div
+            className="w-16 h-16 rounded-2xl mx-auto mb-6 flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
+              color: 'var(--primary-foreground)',
+              boxShadow: 'var(--shadow-lg), inset 0 0.5px 0 0 rgba(255,255,255,0.4)',
+            }}
+          >
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+              <path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5" />
+            </svg>
           </div>
-          <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>
-            Welcome back
-          </h1>
-          <p className="mt-2 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-            Sign in to your StudyQuiz account
-          </p>
+          <h1 className="type-title1 font-bold mb-2">Welcome back</h1>
+          <p className="type-body" style={{ color: 'var(--muted-foreground)' }}>Sign in to your Quizzard account</p>
         </div>
 
-        {/* Card */}
-        <div className="rounded-2xl p-8 shadow-xl border" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
+        <div className="auth-glass-card rounded-[32px] p-8 sm:p-10 shadow-2xl">
           {error && (
-            <div className="mb-4 p-3 rounded-xl text-sm font-medium" style={{ background: 'color-mix(in srgb, var(--danger) 10%, transparent)', color: 'var(--danger)' }}>
+            <div
+              className="p-4 mb-6 rounded-2xl type-footnote text-center"
+              style={{
+                background: 'color-mix(in srgb, var(--danger) 15%, transparent)',
+                color: 'var(--danger)',
+                border: '0.5px solid color-mix(in srgb, var(--danger) 30%, transparent)'
+              }}
+            >
               {error}
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-5">
-            <div>
-              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--foreground)' }}>
-                Email
-              </label>
+            <div className="space-y-1.5">
+              <label className="type-footnote font-medium px-1" style={{ color: 'var(--foreground)' }}>Email</label>
               <input
-                id="login-email"
                 type="email"
+                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                className="w-full px-4 py-3"
                 placeholder="you@university.edu"
-                className="w-full px-4 py-3 rounded-xl border text-sm transition-all duration-200 outline-none"
-                style={{
-                  background: 'var(--muted)',
-                  borderColor: 'var(--border)',
-                  color: 'var(--foreground)',
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--primary)';
-                  e.target.style.boxShadow = '0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--border)';
-                  e.target.style.boxShadow = 'none';
-                }}
               />
             </div>
-
-            <div>
-              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--foreground)' }}>
-                Password
-              </label>
+            <div className="space-y-1.5">
+              <label className="type-footnote font-medium px-1" style={{ color: 'var(--foreground)' }}>Password</label>
               <input
-                id="login-password"
                 type="password"
+                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+                className="w-full px-4 py-3"
                 placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl border text-sm transition-all duration-200 outline-none"
-                style={{
-                  background: 'var(--muted)',
-                  borderColor: 'var(--border)',
-                  color: 'var(--foreground)',
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--primary)';
-                  e.target.style.boxShadow = '0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--border)';
-                  e.target.style.boxShadow = 'none';
-                }}
               />
             </div>
-
-            <button
-              id="login-submit"
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover-lift disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                background: loading ? 'var(--muted)' : 'var(--primary)',
-                color: loading ? 'var(--muted-foreground)' : 'var(--primary-foreground)',
-              }}
-            >
-              {loading ? (
-                <span className="inline-flex items-center gap-2">
-                  <svg className="w-4 h-4" style={{ animation: 'spin 1s linear infinite' }} viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.3" />
-                    <path d="M12 2a10 10 0 019.95 9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                  </svg>
-                  Signing in...
-                </span>
-              ) : (
-                'Sign in'
-              )}
-            </button>
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 px-4 rounded-xl type-callout font-semibold transition-all duration-300 hover-lift depth-press"
+                style={{
+                  background: 'var(--primary)',
+                  color: 'var(--primary-foreground)',
+                  opacity: loading ? 0.7 : 1,
+                  boxShadow: '0 4px 14px 0 color-mix(in srgb, var(--primary) 40%, transparent)',
+                }}
+              >
+                {loading ? 'Signing in...' : 'Sign in'}
+              </button>
+            </div>
           </form>
         </div>
 
-        <p className="text-center mt-6 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-          Don&apos;t have an account?{' '}
-          <Link href="/signup" className="font-semibold hover:underline" style={{ color: 'var(--primary)' }}>
+        <p className="mt-8 text-center type-subhead" style={{ color: 'var(--muted-foreground)' }}>
+          Don't have an account?{' '}
+          <Link href="/signup" className="font-semibold transition-colors hover:underline" style={{ color: 'var(--primary)' }}>
             Create one
           </Link>
         </p>

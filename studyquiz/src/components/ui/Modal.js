@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 export default function Modal({ isOpen, onClose, title, children, size = 'md' }) {
   const [mounted, setMounted] = useState(false);
+  const modalRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
@@ -34,40 +35,52 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' })
   };
 
   const modal = (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {/* Liquid Glass Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-        style={{ animation: 'fadeIn 0.2s ease-out' }}
+        className="absolute inset-0 glass-modal-backdrop animate-fade-in"
         onClick={onClose}
       />
 
-      {/* Modal Panel */}
+      {/* HIG Sheet Modal Panel */}
       <div
-        className={`relative w-full ${sizeClasses[size]} rounded-2xl border shadow-2xl flex flex-col mx-4 sm:mx-6`}
+        ref={modalRef}
+        className={`glass-modal-panel w-full ${sizeClasses[size]} rounded-[28px] overflow-hidden relative z-10 animate-slide-up mx-4 sm:mx-6 flex flex-col`}
         style={{
-          background: 'var(--card)',
-          borderColor: 'var(--border)',
-          animation: 'scaleIn 0.2s ease-out',
+          boxShadow: 'var(--specular-inner), var(--shadow-xl), 0 24px 64px rgba(0,0,0,0.12)',
           maxHeight: '96vh',
         }}
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
-          <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>{title}</h2>
+        {/* Header - Chrome styling */}
+        <div
+          className="flex items-center justify-between px-6 py-4 glass-chrome flex-shrink-0"
+          style={{
+            borderBottom: '0.5px solid var(--glass-chrome-border)'
+          }}
+        >
+          <h2 className="type-title3 font-bold" style={{ color: 'var(--foreground)' }}>
+            {title}
+          </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--muted)]"
-            style={{ color: 'var(--muted-foreground)' }}
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 depth-press"
+            style={{
+              background: 'var(--muted)',
+              color: 'var(--muted-foreground)'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--foreground)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--muted-foreground)'}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M12 4L4 12M4 4l8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
         </div>
 
-        {/* Body */}
-        <div className="px-6 py-5 overflow-y-auto">
+        {/* Content area */}
+        <div className="p-6 overflow-y-auto">
           {children}
         </div>
       </div>

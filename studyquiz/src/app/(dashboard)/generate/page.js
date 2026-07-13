@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { useSearchParams } from 'next/navigation';
+import { Sparkle, CheckCircle, Check, ClipboardText, Lightbulb } from '@phosphor-icons/react';
 import { DifficultyBadge, TypeBadge } from '@/components/ui/Badge';
 
 function GeneratePageContent() {
@@ -126,8 +127,8 @@ function GeneratePageContent() {
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
       <div>
-        <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>
-          <span className="mr-2">✨</span>AI Question Generator
+        <h1 className="text-3xl font-bold flex items-center" style={{ color: 'var(--foreground)' }}>
+          <Sparkle weight="fill" size={32} className="mr-2 text-[var(--primary)]" />AI Question Generator
         </h1>
         <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>
           Paste your class notes and let AI create quiz questions for you
@@ -136,7 +137,9 @@ function GeneratePageContent() {
 
       {saved && (
         <div className="p-4 rounded-xl border flex items-center gap-3" style={{ background: 'color-mix(in srgb, var(--success) 10%, transparent)', borderColor: 'var(--success)', color: 'var(--success)' }}>
-          <span className="text-xl">✅</span>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-[var(--success)]" style={{ background: 'color-mix(in srgb, var(--success) 15%, transparent)' }}>
+            <CheckCircle weight="fill" size={24} />
+          </div>
           <p className="text-sm font-medium">Questions saved successfully! They&apos;re now in your question bank.</p>
         </div>
       )}
@@ -240,7 +243,7 @@ function GeneratePageContent() {
             Generating questions...
           </>
         ) : (
-          <>✨ Generate {count} Questions</>
+          <span className="flex items-center gap-2"><Sparkle weight="fill" size={18} /> Generate {count} Questions</span>
         )}
       </button>
 
@@ -279,7 +282,7 @@ function GeneratePageContent() {
                   {q.type === 'multiple_choice' && q.choices && (
                     <div className="space-y-1.5 mb-2">
                       {q.choices.map((c, ci) => {
-                        const correctList = q.correct_answers || (q.correct_answer ? q.correct_answer.split('|||') : []);
+                        const correctList = q.correct_answers || (q.correct_answer ? (Array.isArray(q.correct_answer) ? q.correct_answer : q.correct_answer.split('|||')) : []);
                         const isCorrect = correctList.includes(c);
                         return (
                           <div key={ci} className="text-xs px-3 py-1.5 rounded-lg" style={{
@@ -287,12 +290,14 @@ function GeneratePageContent() {
                             color: isCorrect ? 'var(--success)' : 'var(--muted-foreground)',
                             fontWeight: isCorrect ? '600' : '400',
                           }}>
-                            {String.fromCharCode(65 + ci)}. {c} {isCorrect && '✓'}
+                            <div className="flex items-center gap-1 flex-1">
+                              {String.fromCharCode(65 + ci)}. {c} {isCorrect && <Check weight="bold" size={16} />}
+                            </div>
                           </div>
                         );
                       })}
                       {q.is_multi_select && (
-                        <p className="text-xs font-medium mt-1" style={{ color: 'var(--accent)' }}>📋 Select all that apply</p>
+                        <p className="text-xs font-medium flex items-center gap-1.5 mt-1" style={{ color: 'var(--accent)' }}><ClipboardText weight="fill" size={14} /> Select all that apply</p>
                       )}
                     </div>
                   )}
@@ -301,7 +306,12 @@ function GeneratePageContent() {
                       <strong>Answer:</strong> {q.correct_answer}
                     </p>
                   )}
-                  {q.explanation && <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>💡 {q.explanation}</p>}
+                  {q.explanation && (
+                    <div className="flex items-start gap-1.5 mt-3 pt-3" style={{ borderTop: '0.5px solid var(--border)' }}>
+                      <Lightbulb weight="fill" size={14} style={{ color: 'var(--warning)', flexShrink: 0, marginTop: '2px' }} />
+                      <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{q.explanation}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

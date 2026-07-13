@@ -5,9 +5,48 @@ import { createClient } from '@/lib/supabase-browser';
 import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import Link from 'next/link';
+import { Books, Calculator, Microscope, Dna, Palette, Bank, Laptop, Globe, Strategy, MusicNotes, Scales, Briefcase, Brain, ChartBar, Wrench } from '@phosphor-icons/react';
 
 const COLORS = ['#6366f1', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#14b8a6'];
-const ICONS = ['📚', '🧮', '🔬', '🧬', '🎨', '🏛️', '💻', '🌍', '📐', '🎵', '⚖️', '💼', '🧠', '📊', '🔧'];
+
+const ICON_MAP = {
+  'Books': Books,
+  'Calculator': Calculator,
+  'Microscope': Microscope,
+  'Dna': Dna,
+  'Palette': Palette,
+  'Bank': Bank,
+  'Laptop': Laptop,
+  'Globe': Globe,
+  'Strategy': Strategy,
+  'MusicNotes': MusicNotes,
+  'Scales': Scales,
+  'Briefcase': Briefcase,
+  'Brain': Brain,
+  'ChartBar': ChartBar,
+  'Wrench': Wrench,
+  '📚': Books,
+  '🧮': Calculator,
+  '🔬': Microscope,
+  '🧬': Dna,
+  '🎨': Palette,
+  '🏛️': Bank,
+  '💻': Laptop,
+  '🌍': Globe,
+  '📐': Strategy,
+  '🎵': MusicNotes,
+  '⚖️': Scales,
+  '💼': Briefcase,
+  '🧠': Brain,
+  '📊': ChartBar,
+  '🔧': Wrench,
+};
+const ICONS = ['Books', 'Calculator', 'Microscope', 'Dna', 'Palette', 'Bank', 'Laptop', 'Globe', 'Strategy', 'MusicNotes', 'Scales', 'Briefcase', 'Brain', 'ChartBar', 'Wrench'];
+
+function renderIcon(iconName) {
+  const IconComponent = ICON_MAP[iconName] || Books;
+  return <IconComponent weight="fill" />;
+}
 
 export default function SubjectsPage() {
   const supabase = createClient();
@@ -115,7 +154,7 @@ export default function SubjectsPage() {
       {/* Grid */}
       {subjects.length === 0 ? (
         <EmptyState
-          icon="📚"
+          icon={<Books weight="fill" />}
           title="No subjects yet"
           description="Create your first subject to start organizing your courses and study material."
           action={
@@ -148,7 +187,7 @@ export default function SubjectsPage() {
                   className="w-12 h-12 rounded-xl flex items-center justify-center text-xl"
                   style={{ background: `color-mix(in srgb, ${subject.color} 15%, transparent)` }}
                 >
-                  {subject.icon || '📚'}
+                  {renderIcon(subject.icon)}
                 </div>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
@@ -213,7 +252,7 @@ export default function SubjectsPage() {
                     background: form.icon === icon ? 'color-mix(in srgb, var(--primary) 10%, transparent)' : 'var(--muted)',
                   }}
                 >
-                  {icon}
+                  {renderIcon(icon)}
                 </button>
               ))}
             </div>

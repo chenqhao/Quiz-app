@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-browser';
+import { Warning, Check, ClipboardText, Envelope, Hourglass, Users, Handshake } from '@phosphor-icons/react';
 
 export default function FriendsPage() {
   const supabase = createClient();
@@ -224,7 +225,7 @@ export default function FriendsPage() {
             border: `1px solid ${message.type === 'error' ? 'var(--danger)' : 'var(--success)'}`,
           }}
         >
-          <span>{message.type === 'error' ? '⚠️' : '✓'}</span>
+          {message.type === 'error' ? <Warning weight="fill" size={16} /> : <Check weight="bold" size={16} />}
           {message.text}
         </div>
       )}
@@ -259,7 +260,11 @@ export default function FriendsPage() {
               color: copied ? 'var(--success-foreground)' : 'var(--primary-foreground)',
             }}
           >
-            {copied ? '✓ Copied!' : '📋 Copy'}
+            {copied ? (
+              <span className="flex items-center gap-1.5"><Check weight="bold" size={16} /> Copied!</span>
+            ) : (
+              <span className="flex items-center gap-1.5"><ClipboardText weight="fill" size={16} /> Copy</span>
+            )}
           </button>
         </div>
       </div>
@@ -314,7 +319,7 @@ export default function FriendsPage() {
           style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
         >
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-            📨 Pending Requests
+            <Envelope weight="fill" size={20} className="text-[var(--primary)]" /> Pending Requests
             <span
               className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold badge-pulse"
               style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
@@ -373,8 +378,8 @@ export default function FriendsPage() {
           className="rounded-2xl border p-6"
           style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
         >
-          <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>
-            ⏳ Sent Requests
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+            <Hourglass weight="fill" size={20} className="text-[var(--warning)]" /> Sent Requests
           </h2>
           <div className="space-y-3">
             {pendingOutgoing.map((req) => (
@@ -415,12 +420,12 @@ export default function FriendsPage() {
         className="rounded-2xl border p-6"
         style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
       >
-        <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>
-          👥 Friends ({friends.length})
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+          <Users weight="fill" size={20} className="text-[var(--primary)]" /> Friends ({friends.length})
         </h2>
         {friends.length === 0 ? (
           <div className="text-center py-8">
-            <span className="text-4xl mb-3 block">🤝</span>
+            <span className="mb-3 flex justify-center text-[var(--muted-foreground)] opacity-50"><Handshake weight="regular" size={48} /></span>
             <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
               No friends yet. Share your code or add someone!
             </p>

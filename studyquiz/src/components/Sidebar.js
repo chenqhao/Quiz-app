@@ -5,28 +5,28 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase-browser';
 
-// SVG icon components
+// SVG icon components — SF Symbols Medium weight (1.5px stroke)
 const icons = {
   menu: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <line x1="3" y1="6" x2="21" y2="6" />
       <line x1="3" y1="12" x2="21" y2="12" />
       <line x1="3" y1="18" x2="21" y2="18" />
     </svg>
   ),
   home: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
       <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
   ),
   library: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
     </svg>
   ),
   studyGroups: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
       <circle cx="9" cy="7" r="4" />
       <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -34,26 +34,26 @@ const icons = {
     </svg>
   ),
   notifications: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
       <path d="M13.73 21a2 2 0 0 1-3.46 0" />
     </svg>
   ),
   plus: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <line x1="12" y1="5" x2="12" y2="19" />
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   ),
   flashcards: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="4" width="16" height="14" rx="2" />
       <path d="M6 2v2" />
       <path d="M22 8v10a2 2 0 0 1-2 2H8" />
     </svg>
   ),
   studyGuides: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
       <polyline points="14 2 14 8 20 8" />
       <line x1="16" y1="13" x2="8" y2="13" />
@@ -62,7 +62,7 @@ const icons = {
     </svg>
   ),
   leaderboard: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7" />
       <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7" />
       <path d="M4 22h16" />
@@ -71,7 +71,7 @@ const icons = {
     </svg>
   ),
   calendar: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
       <line x1="16" y1="2" x2="16" y2="6" />
       <line x1="8" y1="2" x2="8" y2="6" />
@@ -79,18 +79,18 @@ const icons = {
     </svg>
   ),
   settings: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="3" />
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
     </svg>
   ),
   progress: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
     </svg>
   ),
   review: (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
       <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
     </svg>
@@ -188,10 +188,9 @@ export default function Sidebar({ user }) {
     { href: '/progress', icon: icons.progress, label: 'Progress' },
     { href: '/leaderboard', icon: icons.leaderboard, label: 'Leaderboard' },
     { href: '/calendar', icon: icons.calendar, label: 'Calendar' },
-    { href: '/settings', icon: icons.settings, label: 'Settings' },
   ];
 
-  const sidebarWidth = collapsed ? 64 : 240;
+  const sidebarWidth = collapsed ? 68 : 244;
 
   return (
     <aside
@@ -204,26 +203,32 @@ export default function Sidebar({ user }) {
         top: 0,
         display: 'flex',
         flexDirection: 'column',
-        background: 'var(--sidebar)',
-        borderRight: '1px solid var(--sidebar-border)',
-        transition: 'width 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), min-width 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        transition: 'width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), min-width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1)',
         overflow: 'hidden',
         zIndex: 30,
       }}
     >
-      {/* Top: Hamburger + Logo */}
+      {/* Top: Hamburger */}
       <div
         className="flex items-center gap-2 px-3 py-3"
         style={{
           height: 'var(--topbar-height)',
-          borderBottom: '1px solid var(--sidebar-border)',
+          borderBottom: '0.5px solid var(--sidebar-border)',
         }}
       >
-        {/* Hamburger toggle */}
         <button
           onClick={toggleCollapsed}
-          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 hover:bg-[var(--sidebar-accent)] active:scale-95 cursor-pointer flex-shrink-0"
-          style={{ color: 'var(--sidebar-foreground)' }}
+          className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex-shrink-0 depth-press"
+          style={{
+            color: 'var(--sidebar-foreground)',
+            background: 'transparent',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'var(--sidebar-accent)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent';
+          }}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {icons.menu}
@@ -231,33 +236,22 @@ export default function Sidebar({ user }) {
       </div>
 
       {/* Scrollable nav area */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-2" style={{ scrollbarWidth: 'thin' }}>
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3" style={{ scrollbarWidth: 'thin' }}>
         {/* Main nav section */}
-        <div className="px-2 space-y-0.5">
+        <div className="px-2.5 space-y-0.5">
           {mainNav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="sidebar-nav-item flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer relative"
+              className={`sidebar-nav-item flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer relative depth-press ${isActive(item.href) ? 'sidebar-nav-active' : ''}`}
               style={{
                 padding: collapsed ? '10px 0' : '10px 12px',
                 justifyContent: collapsed ? 'center' : 'flex-start',
-                background: isActive(item.href) ? 'color-mix(in srgb, var(--primary) 12%, transparent)' : undefined,
                 color: isActive(item.href) ? 'var(--primary)' : 'var(--sidebar-foreground)',
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive(item.href)) {
-                  e.currentTarget.style.background = 'var(--sidebar-accent)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive(item.href)) {
-                  e.currentTarget.style.background = 'transparent';
-                }
               }}
               title={collapsed ? item.label : undefined}
             >
-              <span className="flex-shrink-0" style={{ opacity: isActive(item.href) ? 1 : 0.7 }}>
+              <span className="flex-shrink-0" style={{ opacity: isActive(item.href) ? 1 : 0.65 }}>
                 {item.icon}
               </span>
               {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
@@ -282,37 +276,31 @@ export default function Sidebar({ user }) {
           ))}
         </div>
 
-        {/* Divider */}
-        <div className="mx-3 my-3" style={{ borderTop: '1px solid var(--sidebar-border)' }} />
+        {/* Divider — subtle separator */}
+        <div className="mx-4 my-3" style={{ borderTop: '0.5px solid var(--sidebar-border)' }} />
 
-        {/* Your classes section */}
+        {/* Your classes section header — HIG caption2 */}
         {!collapsed && (
           <div className="px-4 mb-2">
-            <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
+            <p className="type-caption2" style={{ color: 'var(--muted-foreground)' }}>
               Your classes
             </p>
           </div>
         )}
 
-        <div className="px-2 space-y-0.5">
-          {/* New class button */}
+        <div className="px-2.5 space-y-0.5">
+          {/* Classes link */}
           <Link
             href="/subjects"
-            className="sidebar-nav-item flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer"
+            className={`sidebar-nav-item flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer depth-press ${isActive('/subjects') ? 'sidebar-nav-active' : ''}`}
             style={{
               padding: collapsed ? '10px 0' : '10px 12px',
               justifyContent: collapsed ? 'center' : 'flex-start',
-              color: 'var(--sidebar-foreground)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--sidebar-accent)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
+              color: isActive('/subjects') ? 'var(--primary)' : 'var(--sidebar-foreground)',
             }}
             title={collapsed ? 'Your classes' : undefined}
           >
-            <span className="flex-shrink-0" style={{ opacity: 0.7 }}>
+            <span className="flex-shrink-0" style={{ opacity: isActive('/subjects') ? 1 : 0.65 }}>
               {icons.library}
             </span>
             {!collapsed && <span className="flex-1 truncate">Your classes</span>}
@@ -323,15 +311,24 @@ export default function Sidebar({ user }) {
             <div key={subject.id} className="mb-0.5">
               <button
                 onClick={() => toggleExpand(subject.id)}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-colors hover:bg-[var(--sidebar-accent)] cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-all duration-300 cursor-pointer depth-press"
                 style={{ color: 'var(--sidebar-foreground)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--sidebar-accent)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
               >
                 <span
                   className="w-3 h-3 rounded-full flex-shrink-0"
-                  style={{ background: subject.color || 'var(--primary)' }}
+                  style={{
+                    background: subject.color || 'var(--primary)',
+                    boxShadow: `0 0 6px ${subject.color || 'var(--primary)'}40`,
+                  }}
                 />
                 <span className="truncate flex-1 text-left font-medium">{subject.name}</span>
-                <span className={`transition-transform duration-200 flex-shrink-0 ${expanded[subject.id] ? 'rotate-90' : ''}`} style={{ color: 'var(--muted-foreground)' }}>
+                <span className={`transition-transform duration-300 flex-shrink-0 ${expanded[subject.id] ? 'rotate-90' : ''}`} style={{ color: 'var(--muted-foreground)' }}>
                   {icons.chevron}
                 </span>
               </button>
@@ -340,28 +337,40 @@ export default function Sidebar({ user }) {
                 <div key={course.id} className="ml-4">
                   <Link
                     href={`/subjects/${subject.id}/courses/${course.id}`}
-                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs transition-colors hover:bg-[var(--sidebar-accent)] cursor-pointer"
+                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs transition-all duration-200 cursor-pointer"
                     style={{
                       color: pathname.includes(course.id)
                         ? 'var(--primary)'
                         : 'var(--muted-foreground)',
                     }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'var(--sidebar-accent)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
                   >
-                    <span style={{ color: subject.color || 'var(--primary)', opacity: 0.6 }}>{icons.dot}</span>
+                    <span style={{ color: subject.color || 'var(--primary)', opacity: 0.5 }}>{icons.dot}</span>
                     <span className="truncate">{course.course_code || course.name}</span>
                   </Link>
                   {pathname.includes(course.id) && course.units?.map((unit) => (
                     <Link
                       key={unit.id}
                       href={`/subjects/${subject.id}/courses/${course.id}/units/${unit.id}`}
-                      className="flex items-center gap-2 ml-5 px-3 py-1 rounded-lg text-xs transition-colors hover:bg-[var(--sidebar-accent)] cursor-pointer"
+                      className="flex items-center gap-2 ml-5 px-3 py-1 rounded-xl text-xs transition-all duration-200 cursor-pointer"
                       style={{
                         color: pathname.includes(unit.id)
                           ? 'var(--primary)'
                           : 'var(--muted-foreground)',
                       }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'var(--sidebar-accent)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
                     >
-                      <span className="w-1 h-1 rounded-full" style={{ background: 'var(--muted-foreground)' }} />
+                      <span className="w-1 h-1 rounded-full" style={{ background: 'var(--muted-foreground)', opacity: 0.5 }} />
                       <span className="truncate">{unit.title}</span>
                     </Link>
                   ))}
@@ -372,42 +381,31 @@ export default function Sidebar({ user }) {
         </div>
 
         {/* Divider */}
-        <div className="mx-3 my-3" style={{ borderTop: '1px solid var(--sidebar-border)' }} />
+        <div className="mx-4 my-3" style={{ borderTop: '0.5px solid var(--sidebar-border)' }} />
 
-        {/* Quick Access section */}
+        {/* Quick Access section header — HIG caption2 */}
         {!collapsed && (
           <div className="px-4 mb-2">
-            <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
+            <p className="type-caption2" style={{ color: 'var(--muted-foreground)' }}>
               Quick Access
             </p>
           </div>
         )}
 
-        <div className="px-2 space-y-0.5">
+        <div className="px-2.5 space-y-0.5">
           {quickAccess.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="sidebar-nav-item flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer"
+              className={`sidebar-nav-item flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer depth-press ${isActive(item.href) ? 'sidebar-nav-active' : ''}`}
               style={{
                 padding: collapsed ? '10px 0' : '10px 12px',
                 justifyContent: collapsed ? 'center' : 'flex-start',
-                background: isActive(item.href) ? 'color-mix(in srgb, var(--primary) 12%, transparent)' : undefined,
                 color: isActive(item.href) ? 'var(--primary)' : 'var(--sidebar-foreground)',
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive(item.href)) {
-                  e.currentTarget.style.background = 'var(--sidebar-accent)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive(item.href)) {
-                  e.currentTarget.style.background = 'transparent';
-                }
               }}
               title={collapsed ? item.label : undefined}
             >
-              <span className="flex-shrink-0" style={{ opacity: isActive(item.href) ? 1 : 0.7 }}>
+              <span className="flex-shrink-0" style={{ opacity: isActive(item.href) ? 1 : 0.65 }}>
                 {item.icon}
               </span>
               {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
@@ -417,9 +415,9 @@ export default function Sidebar({ user }) {
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-3 border-t" style={{ borderColor: 'var(--sidebar-border)' }}>
+      <div className="px-3 py-3" style={{ borderTop: '0.5px solid var(--sidebar-border)' }}>
         {!collapsed ? (
-          <p className="text-xs px-1" style={{ color: 'var(--muted-foreground)' }}>
+          <p className="text-xs px-1 font-medium" style={{ color: 'var(--muted-foreground)', letterSpacing: '0.02em' }}>
             Quizzard
           </p>
         ) : (

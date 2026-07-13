@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import Link from 'next/link';
+import { Envelope, GraduationCap } from '@phosphor-icons/react';
 import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {
@@ -42,8 +43,8 @@ export default function SignupPage() {
       <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--background)' }}>
         <div className="w-full max-w-md animate-fade-in">
           <div className="rounded-2xl p-8 shadow-xl border text-center" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{ background: 'color-mix(in srgb, var(--success) 15%, transparent)' }}>
-              <span className="text-3xl">✉️</span>
+            <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-6" style={{ background: 'color-mix(in srgb, var(--primary) 15%, transparent)' }}>
+              <span className="flex items-center justify-center"><Envelope weight="fill" size={32} className="text-[var(--primary)]" /></span>
             </div>
             <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--foreground)' }}>Check your email</h2>
             <p className="text-sm mb-6" style={{ color: 'var(--muted-foreground)' }}>
@@ -74,8 +75,8 @@ export default function SignupPage() {
       <div className="w-full max-w-md animate-fade-in relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary mb-4 shadow-lg">
-            <span className="text-3xl">🎓</span>
+          <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-6" style={{ background: 'color-mix(in srgb, var(--primary) 15%, transparent)' }}>
+            <span className="flex items-center justify-center"><GraduationCap weight="fill" size={32} className="text-[var(--primary)]" /></span>
           </div>
           <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>
             Create your account

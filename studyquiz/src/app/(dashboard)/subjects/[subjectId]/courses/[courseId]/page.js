@@ -6,6 +6,7 @@ import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import Link from 'next/link';
+import { SmileySad, CalendarBlank, Target, ClipboardText } from '@phosphor-icons/react';
 
 export default function CourseDetailPage({ params }) {
   const { subjectId, courseId } = use(params);
@@ -96,7 +97,7 @@ export default function CourseDetailPage({ params }) {
   }
 
   if (!course) {
-    return <EmptyState icon="😕" title="Course not found" description="This course doesn't exist or was deleted." />;
+    return <EmptyState icon={<SmileySad weight="fill" />} title="Course not found" description="This course doesn't exist or was deleted." />;
   }
 
   return (
@@ -115,7 +116,7 @@ export default function CourseDetailPage({ params }) {
             </span>
           )}
           <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>{course.name}</h1>
-          {course.semester && <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>📅 {course.semester}</p>}
+          {course.semester && <p className="text-sm mt-1 flex items-center gap-1.5" style={{ color: 'var(--muted-foreground)' }}><CalendarBlank weight="fill" /> {course.semester}</p>}
           {course.description && <p className="text-sm mt-1 max-w-xl" style={{ color: 'var(--muted-foreground)' }}>{course.description}</p>}
         </div>
         <div className="flex gap-2">
@@ -124,7 +125,7 @@ export default function CourseDetailPage({ params }) {
             className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover-lift flex items-center gap-2 border"
             style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
           >
-            🎯 Quiz All
+            <span className="flex items-center gap-1.5"><Target weight="fill" size={16} /> Quiz All</span>
           </Link>
           <button
             id="add-unit-btn"
@@ -142,7 +143,7 @@ export default function CourseDetailPage({ params }) {
 
       {units.length === 0 ? (
         <EmptyState
-          icon="📋"
+          icon={<ClipboardText weight="fill" />}
           title="No units yet"
           description="Break this course into units to organize your questions."
           action={<button onClick={() => openModal()} className="px-5 py-2.5 rounded-xl text-sm font-semibold hover-lift" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>Add first unit</button>}

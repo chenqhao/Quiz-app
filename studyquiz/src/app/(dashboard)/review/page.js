@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-browser';
 import { TypeBadge, DifficultyBadge, MasteryBadge } from '@/components/ui/Badge';
 import EmptyState from '@/components/ui/EmptyState';
 import Link from 'next/link';
+import { ArrowsClockwise, MagnifyingGlass, Check, Lightbulb } from '@phosphor-icons/react';
 
 export default function ReviewPage() {
   const supabase = createClient();
@@ -85,8 +86,8 @@ export default function ReviewPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>
-          <span className="mr-2">🔄</span>Review Questions
+        <h1 className="text-3xl font-bold flex items-center" style={{ color: 'var(--foreground)' }}>
+          <span className="mr-2 flex items-center justify-center text-[var(--primary)]"><ArrowsClockwise weight="bold" size={28} /></span>Review Questions
         </h1>
         <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>
           Browse, review, and manage your question mastery
@@ -123,7 +124,7 @@ export default function ReviewPage() {
         <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-24 rounded-2xl animate-shimmer" />)}</div>
       ) : questions.length === 0 ? (
         <EmptyState
-          icon="🔍"
+          icon={<MagnifyingGlass weight="fill" />}
           title="No questions found"
           description={selectedSubject ? "Try changing your filters or add some questions first." : "Select a subject to browse questions, or add some questions first."}
           action={
@@ -173,7 +174,7 @@ export default function ReviewPage() {
                             color: isCorrect ? 'var(--success)' : 'var(--muted-foreground)',
                             fontWeight: isCorrect ? '600' : '400',
                           }}>
-                            {String.fromCharCode(65 + ci)}. {c} {isCorrect && '✓'}
+                            {String.fromCharCode(65 + ci)}. {c} {isCorrect && <Check weight="bold" className="inline ml-1" />}
                           </div>
                         );
                       })}
@@ -186,7 +187,7 @@ export default function ReviewPage() {
                     </div>
                   )}
                   {q.explanation && (
-                    <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>💡 {q.explanation}</p>
+                    <p className="text-xs flex items-center gap-1.5" style={{ color: 'var(--muted-foreground)' }}><Lightbulb weight="fill" style={{ color: 'var(--warning)' }} /> {q.explanation}</p>
                   )}
                 </div>
               )}

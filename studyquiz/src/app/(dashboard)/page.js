@@ -1,271 +1,248 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase-browser';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase-browser';
 
-export default function DashboardPage() {
-  const supabase = createClient();
-  const [stats, setStats] = useState({ subjects: 0, courses: 0, questions: 0 });
+const icons = {
+  lightning: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  ),
+  library: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+    </svg>
+  ),
+  book: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+    </svg>
+  ),
+  check: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  )
+};
+
+export default function Dashboard() {
+  const [stats, setStats] = useState({ subjects: 0, questions: 0 });
   const [recentQuizzes, setRecentQuizzes] = useState([]);
   const [weakUnits, setWeakUnits] = useState([]);
   const [jumpBackItems, setJumpBackItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
   useEffect(() => {
-    loadDashboard();
-  }, []);
+    const loadDashboard = async () => {
+      try {
+        const [subjectsRes, questionsRes, quizzesRes] = await Promise.all([
+          supabase.from('subjects').select('id', { count: 'exact', head: true }),
+          supabase.from('questions').select('id', { count: 'exact', head: true }),
+          supabase.from('quiz_attempts').select('*').order('completed_at', { ascending: false }).limit(5),
+        ]);
 
-  const loadDashboard = async () => {
-    try {
-      const [subjectsRes, coursesRes, questionsRes, quizzesRes] = await Promise.all([
-        supabase.from('subjects').select('id', { count: 'exact', head: true }),
-        supabase.from('courses').select('id', { count: 'exact', head: true }),
-        supabase.from('questions').select('id', { count: 'exact', head: true }),
-        supabase.from('quiz_attempts').select('*').order('completed_at', { ascending: false }).limit(5),
-      ]);
-
-      setStats({
-        subjects: subjectsRes.count || 0,
-        courses: coursesRes.count || 0,
-        questions: questionsRes.count || 0,
-      });
-
-      setRecentQuizzes(quizzesRes.data || []);
-
-      // Load weak units — units with lowest average scores
-      const { data: attempts } = await supabase
-        .from('quiz_attempts')
-        .select('unit_id, score, total_questions')
-        .not('unit_id', 'is', null);
-
-      if (attempts && attempts.length > 0) {
-        const unitScores = {};
-        attempts.forEach((a) => {
-          if (!unitScores[a.unit_id]) unitScores[a.unit_id] = { total: 0, correct: 0, count: 0 };
-          unitScores[a.unit_id].total += a.total_questions;
-          unitScores[a.unit_id].correct += a.score;
-          unitScores[a.unit_id].count += 1;
+        setStats({
+          subjects: subjectsRes.count || 0,
+          questions: questionsRes.count || 0,
         });
 
-        const weakIds = Object.entries(unitScores)
-          .map(([id, s]) => ({ id, avg: s.total > 0 ? (s.correct / s.total) * 100 : 0 }))
-          .sort((a, b) => a.avg - b.avg)
-          .slice(0, 3);
+        if (quizzesRes.data && quizzesRes.data.length > 0) {
+          const quizIds = [...new Set(quizzesRes.data.map(q => q.quiz_id))];
+          const { data: quizDetails } = await supabase
+            .from('quizzes')
+            .select('id, title, target_type, target_id')
+            .in('id', quizIds);
 
-        if (weakIds.length > 0) {
-          const { data: units } = await supabase
-            .from('units')
-            .select('id, title, course_id, courses(name, course_code)')
-            .in('id', weakIds.map((w) => w.id));
+          const quizzesMap = {};
+          quizDetails?.forEach(q => { quizzesMap[q.id] = q; });
 
-          setWeakUnits(
-            weakIds.map((w) => {
-              const unit = units?.find((u) => u.id === w.id);
-              return { ...w, title: unit?.title, courseName: unit?.courses?.course_code || unit?.courses?.name };
-            }).filter((w) => w.title)
-          );
+          const mapped = quizzesRes.data.map(attempt => ({
+            ...attempt,
+            quiz: quizzesMap[attempt.quiz_id] || { title: 'Unknown Quiz' }
+          }));
+
+          setRecentQuizzes(mapped);
         }
+
+        // Load weak units
+        const { data: attempts } = await supabase
+          .from('quiz_attempts')
+          .select('unit_id, score, total_questions')
+          .not('unit_id', 'is', null);
+
+        if (attempts && attempts.length > 0) {
+          const unitScores = {};
+          attempts.forEach((a) => {
+            if (!unitScores[a.unit_id]) unitScores[a.unit_id] = { total: 0, correct: 0, count: 0 };
+            unitScores[a.unit_id].total += a.total_questions;
+            unitScores[a.unit_id].correct += a.score;
+            unitScores[a.unit_id].count += 1;
+          });
+
+          const weakIds = Object.entries(unitScores)
+            .map(([id, s]) => ({ id, avg: s.total > 0 ? (s.correct / s.total) * 100 : 0 }))
+            .sort((a, b) => a.avg - b.avg)
+            .slice(0, 3);
+
+          if (weakIds.length > 0) {
+            const { data: units } = await supabase
+              .from('units')
+              .select('id, title, course_id, courses(name, course_code)')
+              .in('id', weakIds.map((w) => w.id));
+
+            setWeakUnits(
+              weakIds.map((w) => {
+                const unit = units?.find((u) => u.id === w.id);
+                return { ...w, title: unit?.title, courseName: unit?.courses?.course_code || unit?.courses?.name };
+              }).filter((w) => w.title)
+            );
+          }
+        }
+
+        // Quick Jump Back
+        const { data: recentSubjects } = await supabase
+          .from('subjects')
+          .select('id, name, color')
+          .order('updated_at', { ascending: false })
+          .limit(4);
+
+        if (recentSubjects && recentSubjects.length > 0) {
+          setJumpBackItems(recentSubjects.map(s => ({
+            id: s.id,
+            title: s.name,
+            color: s.color || 'var(--primary)',
+            href: `/subjects`,
+            type: 'subject',
+          })));
+        }
+
+      } catch (err) {
+        console.error('Error loading dashboard:', err);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      // Quick Jump Back — most recently viewed subjects/courses
-      const { data: recentSubjects } = await supabase
-        .from('subjects')
-        .select('id, name, color, icon')
-        .order('updated_at', { ascending: false })
-        .limit(4);
-
-      if (recentSubjects && recentSubjects.length > 0) {
-        setJumpBackItems(recentSubjects.map(s => ({
-          id: s.id,
-          title: s.name,
-          color: s.color || 'var(--primary)',
-          href: `/subjects`,
-          type: 'subject',
-        })));
-      }
-    } catch (err) {
-      console.error('Dashboard load error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const statCards = [
-    {
-      label: 'Subjects',
-      value: stats.subjects,
-      color: 'var(--primary)',
-      href: '/subjects',
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-        </svg>
-      ),
-    },
-    {
-      label: 'Questions',
-      value: stats.questions,
-      color: 'var(--accent)',
-      href: '/review',
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-          <line x1="12" y1="17" x2="12.01" y2="17" />
-        </svg>
-      ),
-    },
-    {
-      label: 'Quizzes Taken',
-      value: recentQuizzes.length,
-      color: 'var(--success)',
-      href: '/review',
-      icon: (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-          <polyline points="22 4 12 14.01 9 11.01" />
-        </svg>
-      ),
-    },
-  ];
+    loadDashboard();
+  }, [supabase]);
 
   if (loading) {
     return (
-      <div className="space-y-6 animate-fade-in">
-        <div className="h-8 w-48 rounded-2xl animate-shimmer" />
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-28 rounded-2xl animate-shimmer" />
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="h-64 rounded-2xl animate-shimmer" />
-          <div className="h-64 rounded-2xl animate-shimmer" />
-        </div>
+      <div className="flex justify-center items-center h-64">
+        <div
+          className="w-10 h-10 rounded-full border-2 border-t-transparent animate-spin"
+          style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }}
+        />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Header — Apple clean */}
-      <div>
-        <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: 'var(--foreground)' }}>
-          Dashboard
-        </h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>
-          Welcome back! Here&apos;s your study overview.
-        </p>
+    <div className="space-y-8 pb-12 animate-fade-in">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="type-title1 mb-1">Welcome back</h1>
+          <p className="type-body" style={{ color: 'var(--muted-foreground)' }}>
+            Here's what's happening with your studies today.
+          </p>
+        </div>
       </div>
 
-      {/* Stats Bento Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {statCards.map((card, i) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {[
+          { label: 'Subjects', value: stats.subjects, icon: icons.library, color: 'var(--primary)', href: '/subjects' },
+          { label: 'Questions', value: stats.questions, icon: icons.check, color: 'var(--accent)', href: '/review' },
+        ].map((stat, i) => (
           <Link
-            href={card.href || '#'}
-            key={card.label}
-            className={`bento-card bento-card-interactive cursor-pointer animate-fade-in stagger-${i + 1}`}
-            style={{ opacity: 0, animationFillMode: 'forwards' }}
+            href={stat.href}
+            key={stat.label}
+            className="bento-card rounded-[24px] p-6 hover-lift stagger-1"
+            style={{ animationDelay: `${i * 100}ms` }}
           >
             <div className="flex items-start justify-between mb-4">
               <div
-                className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                style={{
-                  background: `color-mix(in srgb, ${card.color} 10%, transparent)`,
-                  color: card.color,
-                }}
+                className="w-12 h-12 rounded-[16px] flex items-center justify-center bento-card-strong"
+                style={{ color: stat.color }}
               >
-                {card.icon}
+                {stat.icon}
               </div>
             </div>
-            <p className="text-2xl lg:text-3xl font-bold tracking-tight" style={{ color: 'var(--foreground)' }}>
-              {card.value}
-            </p>
-            <p className="text-sm mt-1" style={{ color: 'var(--muted-foreground)' }}>{card.label}</p>
+            <div>
+              <p className="type-largeTitle mb-1">{stat.value}</p>
+              <p className="type-subhead" style={{ color: 'var(--muted-foreground)' }}>{stat.label}</p>
+            </div>
           </Link>
         ))}
       </div>
 
-      {/* Quick Actions — Bento style */}
+      {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Link
           href="/subjects"
-          className="bento-card bento-card-interactive flex items-center gap-4 cursor-pointer"
+          className="bento-card rounded-[20px] p-4 flex items-center gap-4 hover-lift depth-press"
         >
           <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'var(--primary)', color: '#fff' }}
+            className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bento-card-strong"
+            style={{ color: 'var(--primary)' }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
+            {icons.library}
           </div>
           <div>
-            <p className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>Add Subject</p>
-            <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Create a new study subject</p>
+            <p className="type-subhead font-semibold" style={{ color: 'var(--foreground)' }}>Add Subject</p>
+            <p className="type-caption1" style={{ color: 'var(--muted-foreground)' }}>Create a new study subject</p>
           </div>
         </Link>
         <Link
           href="/generate"
-          className="bento-card bento-card-interactive flex items-center gap-4 cursor-pointer"
+          className="bento-card rounded-[20px] p-4 flex items-center gap-4 hover-lift depth-press"
         >
           <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg, var(--secondary), var(--accent))', color: '#fff' }}
+            className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bento-card-strong"
+            style={{ color: 'var(--secondary)' }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z" />
-            </svg>
+            {icons.lightning}
           </div>
           <div>
-            <p className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>Generate with AI</p>
-            <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Create questions from notes</p>
+            <p className="type-subhead font-semibold" style={{ color: 'var(--foreground)' }}>Generate with AI</p>
+            <p className="type-caption1" style={{ color: 'var(--muted-foreground)' }}>Create questions from notes</p>
           </div>
         </Link>
         <Link
           href="/review"
-          className="bento-card bento-card-interactive flex items-center gap-4 cursor-pointer"
+          className="bento-card rounded-[20px] p-4 flex items-center gap-4 hover-lift depth-press"
         >
           <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
-            style={{ background: 'var(--success)', color: '#fff' }}
+            className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bento-card-strong"
+            style={{ color: 'var(--success)' }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="23 4 23 10 17 10" />
-              <polyline points="1 20 1 14 7 14" />
-              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-            </svg>
+            {icons.check}
           </div>
           <div>
-            <p className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>Review Questions</p>
-            <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Study your saved questions</p>
+            <p className="type-subhead font-semibold" style={{ color: 'var(--foreground)' }}>Review Questions</p>
+            <p className="type-caption1" style={{ color: 'var(--muted-foreground)' }}>Study your saved questions</p>
           </div>
         </Link>
       </div>
 
-      {/* Quick Jump Back */}
       {jumpBackItems.length > 0 && (
         <div className="animate-fade-in">
-          <h2 className="section-header mb-4">Quick Jump Back</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <h2 className="section-header mb-4 px-2">Quick Jump Back</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {jumpBackItems.map((item, i) => (
               <Link
                 key={item.id}
                 href={item.href}
-                className={`bento-card bento-card-interactive cursor-pointer flex items-center gap-3 animate-fade-in stagger-${i + 1}`}
-                style={{
-                  padding: '16px',
-                  opacity: 0,
-                  animationFillMode: 'forwards',
-                }}
+                className={`bento-card rounded-[20px] p-4 flex items-center gap-3 hover-lift depth-press stagger-${i + 1}`}
               >
                 <div
                   className="w-3 h-3 rounded-full flex-shrink-0"
-                  style={{ background: item.color }}
+                  style={{ background: item.color, boxShadow: `0 0 8px ${item.color}80` }}
                 />
-                <span className="text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>
+                <span className="type-subhead font-medium truncate" style={{ color: 'var(--foreground)' }}>
                   {item.title}
                 </span>
               </Link>
@@ -274,70 +251,63 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Bottom grid — Recent Quizzes + Needs Attention */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Recent Quizzes */}
-        <div className="bento-card">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold tracking-tight" style={{ color: 'var(--foreground)' }}>
-              Recent Quizzes
-            </h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bento-card rounded-[32px] p-6 sm:p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="type-title2">Recent Quizzes</h2>
             {recentQuizzes.length > 0 && (
               <Link
                 href="/review"
-                className="text-xs font-medium cursor-pointer transition-colors"
+                className="type-footnote font-semibold transition-colors hover:underline"
                 style={{ color: 'var(--primary)' }}
               >
-                See All
+                See all
               </Link>
             )}
           </div>
+
           {recentQuizzes.length === 0 ? (
-            <div className="py-8 text-center">
+            <div className="py-8 text-center flex flex-col items-center">
               <div
-                className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center"
-                style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bento-card-strong"
+                style={{ color: 'var(--muted-foreground)' }}
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
+                {icons.check}
               </div>
-              <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                No quizzes taken yet. Start your first quiz!
+              <p className="type-body" style={{ color: 'var(--muted-foreground)' }}>
+                No quizzes taken yet. Generate your first one!
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {recentQuizzes.map((quiz) => {
                 const percentage = Math.round((quiz.score / quiz.total_questions) * 100);
                 const isGood = percentage >= 70;
                 return (
                   <div
                     key={quiz.id}
-                    className="flex items-center justify-between p-3.5 rounded-2xl transition-colors"
-                    style={{ background: 'var(--muted)' }}
+                    className="flex items-center justify-between p-4 rounded-[20px] transition-colors"
+                    style={{ background: 'var(--glass-ultra-thin-bg)', border: '0.5px solid var(--glass-ultra-thin-border)' }}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                       <div
-                        className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold"
+                        className="w-12 h-12 rounded-[14px] flex items-center justify-center type-footnote font-bold"
                         style={{
-                          background: `color-mix(in srgb, ${isGood ? 'var(--success)' : 'var(--danger)'} 12%, transparent)`,
+                          background: `color-mix(in srgb, ${isGood ? 'var(--success)' : 'var(--danger)'} 15%, transparent)`,
                           color: isGood ? 'var(--success)' : 'var(--danger)',
+                          border: `0.5px solid color-mix(in srgb, ${isGood ? 'var(--success)' : 'var(--danger)'} 30%, transparent)`,
                         }}
                       >
                         {percentage}%
                       </div>
                       <div>
-                        <p className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                          {quiz.scope} quiz
-                        </p>
-                        <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                        <p className="type-subhead font-semibold">{quiz.quiz.title}</p>
+                        <p className="type-caption1 mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
                           {new Date(quiz.completed_at).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
-                    <p className="text-sm font-semibold" style={{ color: isGood ? 'var(--success)' : 'var(--danger)' }}>
+                    <p className="type-body font-bold" style={{ color: isGood ? 'var(--success)' : 'var(--danger)' }}>
                       {quiz.score}/{quiz.total_questions}
                     </p>
                   </div>
@@ -348,68 +318,62 @@ export default function DashboardPage() {
         </div>
 
         {/* Needs Attention */}
-        <div className="bento-card">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold tracking-tight" style={{ color: 'var(--foreground)' }}>
-              Needs Attention
-            </h2>
+        <div className="bento-card rounded-[32px] p-6 sm:p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="type-title2">Needs Attention</h2>
             {weakUnits.length > 0 && (
               <Link
                 href="/review"
-                className="text-xs font-medium cursor-pointer transition-colors"
+                className="type-footnote font-semibold transition-colors hover:underline"
                 style={{ color: 'var(--danger)' }}
               >
                 Study Now
               </Link>
             )}
           </div>
+
           {weakUnits.length === 0 ? (
-            <div className="py-8 text-center">
+            <div className="py-8 text-center flex flex-col items-center">
               <div
-                className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center"
-                style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bento-card-strong"
+                style={{ color: 'var(--muted-foreground)' }}
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                  <line x1="12" y1="9" x2="12" y2="13" />
-                  <line x1="12" y1="17" x2="12.01" y2="17" />
-                </svg>
+                {icons.library}
               </div>
-              <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+              <p className="type-body" style={{ color: 'var(--muted-foreground)' }}>
                 Take some quizzes to see which units need more study.
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {weakUnits.map((unit) => (
                 <div
                   key={unit.id}
-                  className="p-3.5 rounded-2xl"
-                  style={{ background: 'var(--muted)' }}
+                  className="p-4 rounded-[20px]"
+                  style={{ background: 'var(--glass-ultra-thin-bg)', border: '0.5px solid var(--glass-ultra-thin-border)' }}
                 >
-                  <div className="flex items-center justify-between mb-2.5">
+                  <div className="flex items-center justify-between mb-3">
                     <div>
-                      <p className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>{unit.title}</p>
-                      <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{unit.courseName}</p>
+                      <p className="type-subhead font-semibold">{unit.title}</p>
+                      <p className="type-caption1 mt-0.5" style={{ color: 'var(--muted-foreground)' }}>{unit.courseName}</p>
                     </div>
                     <span
-                      className="text-sm font-bold px-2 py-0.5 rounded-lg"
+                      className="type-footnote font-bold px-2.5 py-1 rounded-xl"
                       style={{
                         color: unit.avg < 50 ? 'var(--danger)' : 'var(--warning)',
-                        background: `color-mix(in srgb, ${unit.avg < 50 ? 'var(--danger)' : 'var(--warning)'} 10%, transparent)`,
+                        background: `color-mix(in srgb, ${unit.avg < 50 ? 'var(--danger)' : 'var(--warning)'} 15%, transparent)`,
+                        border: `0.5px solid color-mix(in srgb, ${unit.avg < 50 ? 'var(--danger)' : 'var(--warning)'} 30%, transparent)`,
                       }}
                     >
                       {Math.round(unit.avg)}%
                     </span>
                   </div>
-                  <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                  <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--glass-thick-border)' }}>
                     <div
-                      className="h-full rounded-full transition-all duration-700"
+                      className="h-full rounded-full transition-all duration-700 ease-out"
                       style={{
                         width: `${unit.avg}%`,
-                        background: unit.avg < 50
-                          ? 'var(--danger)'
-                          : 'var(--warning)',
+                        background: unit.avg < 50 ? 'var(--danger)' : 'var(--warning)',
                       }}
                     />
                   </div>

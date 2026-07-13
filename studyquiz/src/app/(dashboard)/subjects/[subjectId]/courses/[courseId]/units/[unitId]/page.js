@@ -7,6 +7,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { Badge, DifficultyBadge, TypeBadge, MasteryBadge } from '@/components/ui/Badge';
 import Link from 'next/link';
+import { SmileySad, Target, Sparkle, Question, Check, Notepad, PencilSimple } from '@phosphor-icons/react';
 
 export default function UnitDetailPage({ params }) {
   const { subjectId, courseId, unitId } = use(params);
@@ -115,7 +116,7 @@ export default function UnitDetailPage({ params }) {
     return <div className="space-y-6"><div className="h-6 w-96 rounded-lg animate-shimmer" /><div className="h-10 w-48 rounded-lg animate-shimmer" /><div className="space-y-3">{[1, 2, 3].map(i => <div key={i} className="h-24 rounded-2xl animate-shimmer" />)}</div></div>;
   }
 
-  if (!unit) return <EmptyState icon="😕" title="Unit not found" description="This unit doesn't exist or was deleted." />;
+  if (!unit) return <EmptyState icon={<SmileySad weight="fill" />} title="Unit not found" description="This unit doesn't exist or was deleted." />;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -138,14 +139,14 @@ export default function UnitDetailPage({ params }) {
             className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover-lift flex items-center gap-2 border"
             style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}
           >
-            🎯 Start Quiz
+            <span className="flex items-center gap-1.5"><Target weight="fill" size={16} /> Start Quiz</span>
           </Link>
           <Link
             href={`/generate?unitId=${unitId}&courseId=${courseId}&subjectId=${subjectId}`}
             className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover-lift flex items-center gap-2"
             style={{ background: 'linear-gradient(135deg, var(--accent), var(--secondary))', color: '#fff' }}
           >
-            ✨ Generate with AI
+            <span className="flex items-center gap-1.5"><Sparkle weight="fill" size={16} /> Generate with AI</span>
           </Link>
           <button
             id="add-question-btn"
@@ -162,7 +163,7 @@ export default function UnitDetailPage({ params }) {
       {/* Questions List */}
       {questions.length === 0 ? (
         <EmptyState
-          icon="❓"
+          icon={<Question weight="fill" />}
           title="No questions yet"
           description="Add questions manually or generate them with AI from your class notes."
           action={
@@ -212,7 +213,7 @@ export default function UnitDetailPage({ params }) {
                         }}>
                           <span>{String.fromCharCode(65 + ci)}.</span>
                           <span>{choice}</span>
-                          {choice === q.correct_answer && <span className="ml-auto">✓</span>}
+                          {choice === q.correct_answer && <span className="ml-auto flex items-center"><Check weight="bold" /></span>}
                         </div>
                       ))}
                     </div>
@@ -266,7 +267,7 @@ export default function UnitDetailPage({ params }) {
               <button key={t} onClick={() => setForm({ ...(t === 'multiple_choice' ? emptyMC : emptyWritten), question_text: form.question_text, explanation: form.explanation, difficulty: form.difficulty })}
                 className="flex-1 py-2 rounded-lg text-sm font-semibold transition-all"
                 style={{ background: form.type === t ? 'var(--card)' : 'transparent', color: form.type === t ? 'var(--foreground)' : 'var(--muted-foreground)', boxShadow: form.type === t ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-                {t === 'multiple_choice' ? '📝 Multiple Choice' : '✍️ Written Answer'}
+                {t === 'multiple_choice' ? <span className="flex items-center gap-1.5 justify-center"><Notepad weight="fill" /> Multiple Choice</span> : <span className="flex items-center gap-1.5 justify-center"><PencilSimple weight="fill" /> Written Answer</span>}
               </button>
             ))}
           </div>

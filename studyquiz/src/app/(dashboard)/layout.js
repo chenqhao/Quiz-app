@@ -55,11 +55,17 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="min-h-screen flex" style={{ background: 'var(--background)' }}>
+      {/* Animated Mesh Gradient — provides "content behind glass" for all Liquid Glass surfaces */}
+      <div className="mesh-gradient-bg">
+        <div className="mesh-gradient-orb-1" />
+        <div className="mesh-gradient-orb-2" />
+      </div>
+
       {/* Persistent sidebar */}
       <Sidebar user={user} />
 
       {/* Main content area */}
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 relative z-[1]">
         <TopBar user={user} />
         <main className="flex-1 px-5 lg:px-10 py-6 lg:py-8 max-w-6xl mx-auto w-full">
           {children}

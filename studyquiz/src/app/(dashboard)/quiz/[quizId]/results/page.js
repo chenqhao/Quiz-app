@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import Link from 'next/link';
 import { TypeBadge, DifficultyBadge } from '@/components/ui/Badge';
+import { Confetti, ThumbsUp, Books, Barbell, TrayArrowUp, Link as LinkIcon, Check, ClipboardText, Sparkle, X, Robot, Lightbulb, Notepad, CheckCircle } from '@phosphor-icons/react';
 
 function formatTime(seconds) {
   if (!seconds || seconds === 0) return null;
@@ -197,8 +198,8 @@ export default function QuizResultsPage({ params }) {
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--foreground)' }}>
-          {pct >= 80 ? '🎉 Excellent!' : pct >= 60 ? '👍 Good job!' : pct >= 40 ? '📚 Keep studying!' : '💪 Don\'t give up!'}
+        <h1 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2" style={{ color: 'var(--foreground)' }}>
+          {pct >= 80 ? <><Confetti weight="fill" className="text-[var(--primary)]" /> Excellent!</> : pct >= 60 ? <><ThumbsUp weight="fill" className="text-[var(--success)]" /> Good job!</> : pct >= 40 ? <><Books weight="fill" className="text-[var(--warning)]" /> Keep studying!</> : <><Barbell weight="fill" className="text-[var(--danger)]" /> Don't give up!</>}
         </h1>
         <p className="text-sm mb-6" style={{ color: 'var(--muted-foreground)' }}>
           You scored {attempt.score} out of {attempt.total_questions}
@@ -240,7 +241,7 @@ export default function QuizResultsPage({ params }) {
           className="px-5 py-2.5 rounded-xl text-sm font-semibold hover-lift cursor-pointer"
           style={{ background: 'linear-gradient(135deg, var(--accent), var(--secondary))', color: '#fff' }}
         >
-          📤 Share with Friends
+          <span className="flex items-center gap-1.5"><TrayArrowUp weight="fill" size={18} /> Share with Friends</span>
         </button>
         <Link href="/" className="px-5 py-2.5 rounded-xl text-sm font-semibold border hover-lift" style={{ borderColor: 'var(--border)', color: 'var(--foreground)' }}>
           Back to Dashboard
@@ -250,7 +251,7 @@ export default function QuizResultsPage({ params }) {
       {/* Import Code Section */}
       <div className="rounded-2xl border p-6" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
         <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--foreground)' }}>
-          🔗 Quiz Import Code
+          <span className="flex items-center gap-1.5"><LinkIcon weight="bold" size={18} /> Quiz Import Code</span>
         </h2>
         <p className="text-xs mb-4" style={{ color: 'var(--muted-foreground)' }}>
           Generate a unique code anyone can use to take this same quiz — no friendship needed.
@@ -275,7 +276,7 @@ export default function QuizResultsPage({ params }) {
                 color: '#fff',
               }}
             >
-              {codeCopied ? '✓ Copied!' : '📋 Copy'}
+              {codeCopied ? <span className="flex items-center gap-1.5"><Check weight="bold" size={16} /> Copied!</span> : <span className="flex items-center gap-1.5"><ClipboardText weight="fill" size={16} /> Copy</span>}
             </button>
           </div>
         ) : (
@@ -285,7 +286,7 @@ export default function QuizResultsPage({ params }) {
             className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-50 cursor-pointer"
             style={{ background: 'var(--accent)', color: '#fff' }}
           >
-            {generatingCode ? 'Generating...' : '✨ Generate Import Code'}
+            {generatingCode ? 'Generating...' : <span className="flex items-center gap-1.5"><Sparkle weight="fill" size={16} /> Generate Import Code</span>}
           </button>
         )}
       </div>
@@ -315,7 +316,7 @@ export default function QuizResultsPage({ params }) {
                     background: answer.is_correct ? 'color-mix(in srgb, var(--success) 15%, transparent)' : 'color-mix(in srgb, var(--danger) 15%, transparent)',
                     color: answer.is_correct ? 'var(--success)' : 'var(--danger)',
                   }}>
-                    {answer.is_correct ? '✓' : '✗'}
+                    {answer.is_correct ? <Check weight="bold" /> : <X weight="bold" />}
                   </div>
                   <div className="flex-1">
                     <div className="flex gap-2 mb-2">
@@ -362,8 +363,8 @@ export default function QuizResultsPage({ params }) {
                             }}>
                               <span>{String.fromCharCode(65 + ci)}.</span>
                               <span>{choice}</span>
-                              {isCorrectChoice && <span className="ml-auto">✓ Correct</span>}
-                              {isUserChoice && !isCorrectChoice && <span className="ml-auto">✗ Your answer</span>}
+                              {isCorrectChoice && <span className="ml-auto flex items-center gap-1"><Check weight="bold" /> Correct</span>}
+                              {isUserChoice && !isCorrectChoice && <span className="ml-auto flex items-center gap-1"><X weight="bold" /> Your answer</span>}
                             </div>
                           );
                         })}
@@ -391,7 +392,7 @@ export default function QuizResultsPage({ params }) {
                     {/* AI Feedback */}
                     {answer.ai_feedback && (
                       <div className="p-3 rounded-lg mb-2" style={{ background: 'color-mix(in srgb, var(--accent) 8%, transparent)' }}>
-                        <p className="text-xs font-semibold mb-1" style={{ color: 'var(--accent)' }}>🤖 AI Feedback</p>
+                        <p className="text-xs font-semibold mb-1 flex items-center gap-1.5" style={{ color: 'var(--accent)' }}><Robot weight="fill" size={16} /> AI Feedback</p>
                         <p className="text-xs" style={{ color: 'var(--foreground)' }}>{answer.ai_feedback}</p>
                       </div>
                     )}
@@ -399,7 +400,7 @@ export default function QuizResultsPage({ params }) {
                     {/* Explanation */}
                     {q.explanation && (
                       <div className="p-3 rounded-lg" style={{ background: 'var(--muted)' }}>
-                        <p className="text-xs font-semibold mb-1" style={{ color: 'var(--muted-foreground)' }}>💡 Explanation</p>
+                        <p className="text-xs font-semibold mb-1 flex items-center gap-1.5" style={{ color: 'var(--muted-foreground)' }}><Lightbulb weight="fill" size={16} style={{ color: 'var(--warning)' }} /> Explanation</p>
                         <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{q.explanation}</p>
                       </div>
                     )}
@@ -415,7 +416,7 @@ export default function QuizResultsPage({ params }) {
       {needsReview.length > 0 && (
         <div className="rounded-2xl border p-6" style={{ background: 'var(--card)', borderColor: 'var(--border)' }}>
           <h2 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
-            📝 Questions to Review ({needsReview.length})
+            <Notepad weight="fill" size={20} className="text-[var(--primary)]" /> Questions to Review ({needsReview.length})
           </h2>
           <div className="space-y-2">
             {needsReview.map((a) => (
@@ -437,7 +438,7 @@ export default function QuizResultsPage({ params }) {
           >
             {shareSuccess ? (
               <div className="text-center py-8">
-                <span className="text-5xl block mb-3">✅</span>
+                <span className="mb-3 flex justify-center text-[var(--success)]"><CheckCircle weight="fill" size={48} /></span>
                 <p className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>Quiz Shared!</p>
                 <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
                   Your friends will find it in their inbox.
@@ -446,7 +447,7 @@ export default function QuizResultsPage({ params }) {
             ) : (
               <>
                 <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--foreground)' }}>
-                  📤 Share Quiz with Friends
+                  <span className="flex items-center gap-1.5"><TrayArrowUp weight="fill" size={20} className="text-[var(--primary)]" /> Share Quiz with Friends</span>
                 </h3>
                 <p className="text-xs mb-4" style={{ color: 'var(--muted-foreground)' }}>
                   Select friends to send this quiz to. They&apos;ll get it in their inbox.
@@ -482,7 +483,7 @@ export default function QuizResultsPage({ params }) {
                           {f.full_name || 'Unknown'}
                         </span>
                         {selectedFriends.includes(f.id) && (
-                          <span style={{ color: 'var(--primary)' }}>✓</span>
+                          <span className="text-[var(--primary)]"><Check weight="bold" size={16} /></span>
                         )}
                       </button>
                     ))

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@/lib/supabase-browser';
+import { Target, BookOpen } from '@phosphor-icons/react';
 
 // ── helpers ──────────────────────────────────────────────────
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -27,8 +28,8 @@ function daysUntil(dateStr) {
 }
 
 const EVENT_TYPES = [
-  { value: 'exam', label: 'Exam', icon: '🎯' },
-  { value: 'study', label: 'Study Session', icon: '📖' },
+  { value: 'exam', label: 'Exam', icon: <Target weight="fill" size={16} /> },
+  { value: 'study', label: 'Study Session', icon: <BookOpen weight="fill" size={16} /> },
 ];
 
 const EVENT_COLORS = [
@@ -474,8 +475,8 @@ export default function CalendarPage() {
             className="rounded-2xl border p-5"
             style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
           >
-            <h3 className="text-sm font-bold mb-3" style={{ color: 'var(--foreground)' }}>
-              🎯 Upcoming Exams
+            <h3 className="text-sm font-bold mb-3 flex items-center gap-1.5" style={{ color: 'var(--foreground)' }}>
+              <Target weight="fill" size={18} style={{ color: 'var(--danger)' }} /> Upcoming Exams
             </h3>
             {upcomingExams.length === 0 ? (
               <p className="text-xs py-4 text-center" style={{ color: 'var(--muted-foreground)' }}>
@@ -558,7 +559,7 @@ export default function CalendarPage() {
                     style={{ background: 'var(--muted)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
                   >
                     {EVENT_TYPES.map((t) => (
-                      <option key={t.value} value={t.value}>{t.icon} {t.label}</option>
+                      <option key={t.value} value={t.value}>{t.label}</option>
                     ))}
                   </select>
                 </div>

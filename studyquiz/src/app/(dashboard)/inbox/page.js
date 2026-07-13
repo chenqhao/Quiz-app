@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Warning, Check, TrayArrowDown, EnvelopeOpen, TrayArrowUp, Tray, Target, RocketLaunch } from '@phosphor-icons/react';
 
 function InboxContent() {
   const supabase = createClient();
@@ -204,7 +205,7 @@ function InboxContent() {
             border: `1px solid ${message.type === 'error' ? 'var(--danger)' : 'var(--success)'}`,
           }}
         >
-          <span>{message.type === 'error' ? '⚠️' : '✓'}</span>
+          {message.type === 'error' ? <Warning weight="fill" size={16} /> : <Check weight="bold" size={16} />}
           {message.text}
         </div>
       )}
@@ -214,8 +215,8 @@ function InboxContent() {
         className="rounded-2xl border p-6"
         style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
       >
-        <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--foreground)' }}>
-          📥 Import Quiz by Code
+        <h2 className="text-lg font-bold mb-1 flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+          <TrayArrowDown weight="fill" size={20} className="text-[var(--primary)]" /> Import Quiz by Code
         </h2>
         <p className="text-xs mb-4" style={{ color: 'var(--muted-foreground)' }}>
           Paste a quiz import code to take someone else&apos;s quiz — no friendship required.
@@ -259,14 +260,15 @@ function InboxContent() {
       >
         <button
           onClick={() => setActiveTab('received')}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-semibold transition-all duration-300 cursor-pointer"
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+            activeTab === 'received' ? 'shadow-sm' : 'hover:bg-[var(--border)]'
+          }`}
           style={{
             background: activeTab === 'received' ? 'var(--card)' : 'transparent',
             color: activeTab === 'received' ? 'var(--foreground)' : 'var(--muted-foreground)',
-            boxShadow: activeTab === 'received' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
           }}
         >
-          📬 Received
+          <EnvelopeOpen weight="fill" size={18} /> Received
           {unreadCount > 0 && (
             <span
               className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold badge-pulse"
@@ -278,14 +280,15 @@ function InboxContent() {
         </button>
         <button
           onClick={() => setActiveTab('sent')}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-semibold transition-all duration-300 cursor-pointer"
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
+            activeTab === 'sent' ? 'shadow-sm' : 'hover:bg-[var(--border)]'
+          }`}
           style={{
             background: activeTab === 'sent' ? 'var(--card)' : 'transparent',
             color: activeTab === 'sent' ? 'var(--foreground)' : 'var(--muted-foreground)',
-            boxShadow: activeTab === 'sent' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
           }}
         >
-          📤 Sent
+          <TrayArrowUp weight="fill" size={18} /> Sent
         </button>
       </div>
 
@@ -297,10 +300,12 @@ function InboxContent() {
               className="rounded-2xl border p-8 text-center"
               style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
             >
-              <span className="text-4xl mb-3 block">📭</span>
-              <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                No quizzes received yet. Ask friends to share their quizzes!
-              </p>
+              <div className="text-center py-12">
+                <span className="mb-3 flex justify-center text-[var(--muted-foreground)] opacity-50"><Tray weight="regular" size={48} /></span>
+                <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+                  No received quizzes yet. Ask friends to share their quizzes!
+                </p>
+              </div>
             </div>
           ) : (
             receivedMail.map((mail, i) => (
@@ -343,8 +348,8 @@ function InboxContent() {
                       </span>
                     </div>
 
-                    <p className="text-sm mb-1" style={{ color: 'var(--foreground)' }}>
-                      🎯 Shared a quiz — {(mail.question_ids || []).length} questions
+                    <p className="text-xs font-medium flex items-center gap-1.5 mb-2 mt-1" style={{ color: 'var(--foreground)' }}>
+                      <Target weight="fill" size={14} className="text-[var(--accent)]" /> Shared a quiz — {(mail.question_ids || []).length} questions
                       {mail.subject_name && (
                         <span style={{ color: 'var(--muted-foreground)' }}> • {mail.subject_name}</span>
                       )}
@@ -365,7 +370,7 @@ function InboxContent() {
                           color: '#fff',
                         }}
                       >
-                        🚀 Take Quiz
+                        <span className="flex items-center gap-1.5"><RocketLaunch weight="fill" size={16} /> Take Quiz</span>
                       </button>
                       <button
                         onClick={() => handleDeleteMail(mail.id)}
@@ -388,10 +393,12 @@ function InboxContent() {
               className="rounded-2xl border p-8 text-center"
               style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
             >
-              <span className="text-4xl mb-3 block">📤</span>
-              <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                No quizzes sent yet. Share a quiz from your results page!
-              </p>
+              <div className="text-center py-12">
+                <span className="mb-3 flex justify-center text-[var(--muted-foreground)] opacity-50"><TrayArrowUp weight="regular" size={48} /></span>
+                <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
+                  No quizzes sent yet. Share a quiz from your results page!
+                </p>
+              </div>
             </div>
           ) : (
             sentMail.map((mail, i) => (

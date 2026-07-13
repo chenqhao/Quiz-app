@@ -1,164 +1,282 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase-browser';
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import Breadcrumb from '@/components/ui/Breadcrumb';
+
+// SVG icon components — SF Symbols Medium weight (1.5px stroke)
+const icons = {
+  search: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  ),
+  plus: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  ),
+  lightning: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  ),
+  moon: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  ),
+  sun: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  ),
+  settings: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  ),
+  logout: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  ),
+  user: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  )
+};
 
 export default function TopBar({ user }) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
-  const [showMenu, setShowMenu] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+  const [dynamicTitle, setDynamicTitle] = useState('Home');
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/login');
-    router.refresh();
-  };
-
-  const toggleDarkMode = () => {
-    document.documentElement.classList.toggle('dark');
-    const isDark = document.documentElement.classList.contains('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  };
-
-  const [pageTitle, setPageTitle] = useState('Loading...');
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+  }, []);
 
   useEffect(() => {
     const fetchTitle = async () => {
-      const segments = pathname.split('/').filter(Boolean);
-      if (segments.length === 0) {
-        setPageTitle('Home');
-        return;
-      }
-
-      const lastSegment = segments[segments.length - 1];
-
-      // UUID check
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-      if (uuidRegex.test(lastSegment)) {
-        let table = '';
-        let column = '';
-        if (segments[segments.length - 2] === 'subjects') { table = 'subjects'; column = 'name'; }
-        else if (segments[segments.length - 2] === 'courses') { table = 'courses'; column = 'name'; }
-        else if (segments[segments.length - 2] === 'units') { table = 'units'; column = 'title'; }
-        if (table) {
-          try {
-            const { data } = await supabase.from(table).select(column).eq('id', lastSegment).single();
-            if (data) {
-              setPageTitle(data[column]);
-              return;
-            }
-          } catch (err) {
-            console.error('Error fetching title for topbar:', err);
-          }
+      if (pathname === '/') {
+        setDynamicTitle('Home');
+      } else if (pathname === '/generate') {
+        setDynamicTitle('Generate');
+      } else if (pathname.includes('/subjects')) {
+        const segments = pathname.split('/').filter(Boolean);
+        if (segments.length === 2 && segments[0] === 'subjects') {
+          const { data } = await supabase.from('subjects').select('name').eq('id', segments[1]).single();
+          setDynamicTitle(data ? data.name : 'Subject');
+        } else if (segments.length === 4 && segments[2] === 'courses') {
+          const { data } = await supabase.from('courses').select('course_code, name').eq('id', segments[3]).single();
+          setDynamicTitle(data ? (data.course_code || data.name) : 'Course');
+        } else if (segments.length === 6 && segments[4] === 'units') {
+          const { data } = await supabase.from('units').select('title').eq('id', segments[5]).single();
+          setDynamicTitle(data ? data.title : 'Unit');
+        } else {
+          setDynamicTitle('Subjects');
+        }
+      } else {
+        const segment = pathname.split('/')[1];
+        if (segment) {
+          setDynamicTitle(segment.charAt(0).toUpperCase() + segment.slice(1));
         }
       }
-
-      setPageTitle(lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1));
     };
 
     fetchTitle();
   }, [pathname, supabase]);
 
+
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    if (root.classList.contains('dark')) {
+      root.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      setIsDark(false);
+    } else {
+      root.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setIsDark(true);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <header
-      className="sticky top-0 z-20 flex items-center justify-between px-5 lg:px-3 glass-heavy border-b"
+      className="glass-chrome sticky top-0 z-20 flex items-center justify-between px-5 py-3 transition-all duration-300"
       style={{
         height: 'var(--topbar-height)',
-        borderColor: 'var(--border)',
+        borderBottom: '0.5px solid var(--glass-chrome-border)'
       }}
     >
-      {/* Left section: Logo + Page breadcrumb */}
-      <div className="flex items-center gap-3">
-        <Link
-          href="/"
-          className="flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer flex-shrink-0"
-          style={{ background: 'var(--primary)' }}
-          title="Go to Home"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-            <path d="M6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5" />
-          </svg>
-        </Link>
-        <span className="text-base font-semibold" style={{ color: 'var(--foreground)' }}>{pageTitle}</span>
+      <div className="flex items-center gap-4 flex-1">
+        <h1 className="type-headline" style={{ color: 'var(--foreground)' }}>
+          {dynamicTitle}
+        </h1>
+
+        <div className="hidden md:flex items-center">
+          <Breadcrumb />
+        </div>
       </div>
 
-      {/* Right section */}
-      <div className="flex items-center gap-1.5">
-
-
-        {/* User avatar menu */}
-        <div className="relative">
-          <button
-            onClick={() => setShowMenu(!showMenu)}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200 hover:ring-2 active:scale-95 cursor-pointer overflow-hidden"
+      <div className="flex items-center gap-3">
+        {/* Global Search — liquid glass pill */}
+        <div className="relative group hidden sm:block">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span style={{ color: 'var(--muted-foreground)' }}>{icons.search}</span>
+          </div>
+          <input
+            type="text"
+            placeholder="Search..."
+            className="w-48 xl:w-64 pl-10 pr-4 py-1.5 text-sm type-footnote"
             style={{
-              background: 'linear-gradient(135deg, var(--primary), var(--secondary))',
-              color: '#ffffff',
-              '--tw-ring-color': 'var(--ring)',
-              '--tw-ring-offset-width': '2px',
-              '--tw-ring-offset-color': 'var(--background)',
+              background: 'var(--glass-ultra-thin-bg)',
+              border: '0.5px solid var(--glass-ultra-thin-border)',
+              borderRadius: '999px',
+              color: 'var(--foreground)',
+              transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+            }}
+            onFocus={(e) => {
+              e.target.style.width = '280px';
+              e.target.style.background = 'var(--glass-regular-bg)';
+              e.target.style.borderColor = 'var(--primary)';
+              e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary) 15%, transparent)';
+            }}
+            onBlur={(e) => {
+              e.target.style.width = '';
+              e.target.style.background = 'var(--glass-ultra-thin-bg)';
+              e.target.style.borderColor = 'var(--glass-ultra-thin-border)';
+              e.target.style.boxShadow = 'none';
+            }}
+          />
+        </div>
+
+        {/* User Profile Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="w-9 h-9 rounded-full overflow-hidden transition-all duration-300 depth-press glass flex items-center justify-center hover-lift"
+            style={{
+              padding: '2px',
             }}
           >
             {user?.user_metadata?.avatar_url ? (
-              <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+              <img
+                src={user.user_metadata.avatar_url}
+                alt="Avatar"
+                className="w-full h-full object-cover rounded-full"
+              />
             ) : (
-              user?.user_metadata?.full_name?.[0]?.toUpperCase() || '?'
+              <div
+                className="w-full h-full rounded-full flex items-center justify-center"
+                style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}
+              >
+                {user?.user_metadata?.full_name?.[0]?.toUpperCase() || icons.user}
+              </div>
             )}
           </button>
 
-          {showMenu && (
-            <>
-              <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-              <div
-                className="absolute right-0 top-12 w-56 rounded-2xl border shadow-xl z-50 py-1.5 animate-scale-in overflow-hidden"
-                style={{
-                  background: 'var(--card)',
-                  borderColor: 'var(--border)',
-                  boxShadow: '0 12px 40px rgba(0,0,0,0.12)',
-                }}
-              >
-                <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
-                  <p className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>
-                    {user?.user_metadata?.full_name || 'Student'}
-                  </p>
-                  <p className="text-xs truncate mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
-                    {user?.email}
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowMenu(false);
-                    router.push('/settings');
-                  }}
-                  className="w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-[var(--muted)] flex items-center gap-2.5 cursor-pointer"
+          {dropdownOpen && (
+            <div
+              className="absolute right-0 mt-2 w-56 rounded-2xl animate-scale-in origin-top-right overflow-hidden"
+              style={{
+                background: 'var(--glass-thick-bg)',
+                backdropFilter: 'var(--glass-thick-blur)',
+                WebkitBackdropFilter: 'var(--glass-thick-blur)',
+                border: '0.5px solid var(--glass-thick-border)',
+                boxShadow: 'var(--specular-inner), var(--shadow-xl)',
+                zIndex: 50,
+              }}
+            >
+              {/* User Info Header */}
+              <div className="px-4 py-3" style={{ borderBottom: '0.5px solid var(--glass-regular-border)', background: 'var(--glass-ultra-thin-bg)' }}>
+                <p className="type-footnote font-semibold truncate" style={{ color: 'var(--foreground)' }}>
+                  {user?.email}
+                </p>
+              </div>
+
+              {/* Menu Items */}
+              <div className="p-1.5 space-y-0.5">
+                <Link
+                  href="/settings"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-all duration-200 cursor-pointer depth-press"
+                  onClick={() => setDropdownOpen(false)}
                   style={{ color: 'var(--foreground)' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--muted)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="3" />
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                  </svg>
+                  <span style={{ color: 'var(--muted-foreground)' }}>{icons.settings}</span>
                   Settings
-                </button>
-                <div className="border-t my-1" style={{ borderColor: 'var(--border)' }} />
+                </Link>
+
                 <button
-                  onClick={handleLogout}
-                  className="w-full px-4 py-2.5 text-left text-sm transition-colors hover:bg-[var(--muted)] flex items-center gap-2.5 cursor-pointer"
-                  style={{ color: 'var(--danger)' }}
+                  onClick={toggleTheme}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm transition-all duration-200 cursor-pointer depth-press"
+                  style={{ color: 'var(--foreground)' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--muted)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" y1="12" x2="9" y2="12" />
-                  </svg>
-                  Sign out
+                  <span style={{ color: 'var(--muted-foreground)' }}>
+                    {isDark ? icons.sun : icons.moon}
+                  </span>
+                  {isDark ? 'Light Mode' : 'Dark Mode'}
                 </button>
               </div>
-            </>
+
+              <div className="p-1.5" style={{ borderTop: '0.5px solid var(--glass-regular-border)' }}>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer depth-press"
+                  style={{ color: 'var(--danger)' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'color-mix(in srgb, var(--danger) 15%, transparent)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  <span style={{ opacity: 0.8 }}>{icons.logout}</span>
+                  Sign Out
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-browser';
+import { ChartBar, CheckCircle, Timer, Medal, Trophy } from '@phosphor-icons/react';
 
 const TABS = [
-  { key: 'completed', label: 'Questions Completed', icon: '📊', description: 'Total questions attempted' },
-  { key: 'correct', label: 'Questions Correct', icon: '✅', description: 'Total correct answers' },
-  { key: 'time', label: 'Time Spent', icon: '⏱️', description: 'Total time studying' },
+  { key: 'completed', label: 'Questions Completed', icon: <ChartBar weight="fill" size={20} />, description: 'Total questions attempted' },
+  { key: 'correct', label: 'Questions Correct', icon: <CheckCircle weight="fill" size={20} />, description: 'Total correct answers' },
+  { key: 'time', label: 'Time Spent', icon: <Timer weight="fill" size={20} />, description: 'Total time studying' },
 ];
 
 function formatTime(seconds) {
@@ -98,9 +99,9 @@ export default function LeaderboardPage() {
   const currentTab = TABS.find(t => t.key === activeTab);
 
   const getRankBadge = (rank) => {
-    if (rank === 0) return { emoji: '🥇', bg: 'linear-gradient(135deg, #FFD700, #FFA500)', shadow: '0 4px 12px rgba(255, 215, 0, 0.3)' };
-    if (rank === 1) return { emoji: '🥈', bg: 'linear-gradient(135deg, #C0C0C0, #A0A0A0)', shadow: '0 4px 12px rgba(192, 192, 192, 0.3)' };
-    if (rank === 2) return { emoji: '🥉', bg: 'linear-gradient(135deg, #CD7F32, #B87333)', shadow: '0 4px 12px rgba(205, 127, 50, 0.3)' };
+    if (rank === 0) return { icon: <Medal weight="fill" className="text-[#FFD700]" />, bg: 'linear-gradient(135deg, #FFD700, #FFA500)', shadow: '0 4px 12px rgba(255, 215, 0, 0.3)' };
+    if (rank === 1) return { icon: <Medal weight="fill" className="text-[#C0C0C0]" />, bg: 'linear-gradient(135deg, #C0C0C0, #A0A0A0)', shadow: '0 4px 12px rgba(192, 192, 192, 0.3)' };
+    if (rank === 2) return { icon: <Medal weight="fill" className="text-[#CD7F32]" />, bg: 'linear-gradient(135deg, #CD7F32, #B87333)', shadow: '0 4px 12px rgba(205, 127, 50, 0.3)' };
     return null;
   };
 
@@ -151,7 +152,7 @@ export default function LeaderboardPage() {
               boxShadow: activeTab === tab.key ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
             }}
           >
-            <span className="text-base">{tab.icon}</span>
+            <span className="flex items-center justify-center">{tab.icon}</span>
             <span className="hidden sm:inline">{tab.label}</span>
           </button>
         ))}
@@ -168,7 +169,7 @@ export default function LeaderboardPage() {
           className="rounded-2xl border p-8 text-center"
           style={{ background: 'var(--card)', borderColor: 'var(--border)' }}
         >
-          <span className="text-5xl mb-4 block">🏆</span>
+          <span className="mb-4 flex justify-center text-[var(--muted-foreground)] opacity-50"><Trophy weight="regular" size={48} /></span>
           <p className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
             Add some friends to see the leaderboard!
           </p>
@@ -200,9 +201,9 @@ export default function LeaderboardPage() {
               >
                 <div className="flex items-center gap-4">
                   {/* Rank */}
-                  <div className="flex-shrink-0 w-10 text-center">
+                  <div className="flex-shrink-0 w-10 flex justify-center">
                     {badge ? (
-                      <span className="text-2xl">{badge.emoji}</span>
+                      <span className="text-2xl">{badge.icon}</span>
                     ) : (
                       <span
                         className="text-lg font-bold"

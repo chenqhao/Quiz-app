@@ -6,6 +6,8 @@ import Modal from '@/components/ui/Modal';
 import EmptyState from '@/components/ui/EmptyState';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import Link from 'next/link';
+import { SmileySad, Book, CalendarBlank } from '@phosphor-icons/react';
+import { renderIcon } from '@/lib/icons';
 
 export default function SubjectDetailPage({ params }) {
   const { subjectId } = use(params);
@@ -92,7 +94,7 @@ export default function SubjectDetailPage({ params }) {
   }
 
   if (!subject) {
-    return <EmptyState icon="😕" title="Subject not found" description="This subject doesn't exist or was deleted." />;
+    return <EmptyState icon={<SmileySad weight="fill" />} title="Subject not found" description="This subject doesn't exist or was deleted." />;
   }
 
   return (
@@ -105,7 +107,7 @@ export default function SubjectDetailPage({ params }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl" style={{ background: `color-mix(in srgb, ${subject.color} 15%, transparent)` }}>
-            {subject.icon || '📚'}
+            {renderIcon(subject.icon)}
           </div>
           <div>
             <h1 className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>{subject.name}</h1>
@@ -129,7 +131,7 @@ export default function SubjectDetailPage({ params }) {
 
       {courses.length === 0 ? (
         <EmptyState
-          icon="📖"
+          icon={<Book weight="fill" />}
           title="No courses yet"
           description="Add your first course to this subject."
           action={
@@ -165,7 +167,7 @@ export default function SubjectDetailPage({ params }) {
                   </button>
                 </div>
               </div>
-              {course.semester && <p className="text-xs mb-1" style={{ color: 'var(--muted-foreground)' }}>📅 {course.semester}</p>}
+              {course.semester && <p className="text-xs mb-1 flex items-center gap-1.5" style={{ color: 'var(--muted-foreground)' }}><CalendarBlank weight="fill" /> {course.semester}</p>}
               {course.description && <p className="text-sm line-clamp-2" style={{ color: 'var(--muted-foreground)' }}>{course.description}</p>}
               <p className="text-xs mt-3 font-medium" style={{ color: 'var(--muted-foreground)' }}>
                 {course.units?.length || 0} unit{(course.units?.length || 0) !== 1 ? 's' : ''}
