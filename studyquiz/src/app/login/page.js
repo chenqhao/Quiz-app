@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase-browser';
 import Link from 'next/link';
 import { Envelope, ArrowLeft } from '@phosphor-icons/react';
+import DotField from '@/components/ui/DotField';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -55,10 +56,19 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative" style={{ background: 'var(--background)' }}>
-      {/* Mesh Gradient Background */}
-      <div className="mesh-gradient-bg">
-        <div className="mesh-gradient-orb-1" />
-        <div className="mesh-gradient-orb-2" />
+      {/* Interactive Dot Field Background */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <DotField
+          dotRadius={1.5}
+          dotSpacing={14}
+          bulgeStrength={67}
+          glowRadius={160}
+          sparkle={false}
+          waveAmplitude={0}
+          gradientFrom="rgba(0, 122, 255, 0.6)"
+          gradientTo="rgba(88, 86, 214, 0.45)"
+          glowColor="#0a0a0f"
+        />
       </div>
 
       <div className="w-full max-w-md relative z-10 animate-slide-up">
