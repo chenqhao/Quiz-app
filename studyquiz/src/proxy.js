@@ -25,9 +25,14 @@ export async function proxy(request) {
     }
   );
 
+  // Use getSession() instead of getUser() — reads from local cookie (instant)
+  // instead of making a round-trip to Supabase servers on every request.
+  // getUser() should only be used in server components where token verification matters.
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const user = session?.user;
 
   // Public routes that don't require auth
   const publicPaths = ['/login', '/signup', '/auth/callback'];

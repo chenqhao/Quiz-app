@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase-browser';
 import Breadcrumb from '@/components/ui/Breadcrumb';
+import SearchModal from '@/components/SearchModal';
 
 // SVG icon components — SF Symbols Medium weight (1.5px stroke)
 const icons = {
@@ -66,12 +67,25 @@ const icons = {
 
 export default function TopBar({ user }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const dropdownRef = useRef(null);
   const router = useRouter();
   const pathname = usePathname();
   const supabase = createClient();
   const [isDark, setIsDark] = useState(false);
   const [dynamicTitle, setDynamicTitle] = useState('Home');
+
+  // Global ⌘K / Ctrl+K shortcut
+  useEffect(() => {
+    const handleGlobalKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    document.addEventListener('keydown', handleGlobalKey);
+    return () => document.removeEventListener('keydown', handleGlobalKey);
+  }, []);
 
   useEffect(() => {
     setIsDark(document.documentElement.classList.contains('dark'));
@@ -157,36 +171,21 @@ export default function TopBar({ user }) {
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Global Search — liquid glass pill */}
-        <div className="relative group hidden sm:block">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span style={{ color: 'var(--muted-foreground)' }}>{icons.search}</span>
-          </div>
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-48 xl:w-64 pl-10 pr-4 py-1.5 text-sm type-footnote"
-            style={{
-              background: 'var(--glass-ultra-thin-bg)',
-              border: '0.5px solid var(--glass-ultra-thin-border)',
-              borderRadius: '999px',
-              color: 'var(--foreground)',
-              transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
-            }}
-            onFocus={(e) => {
-              e.target.style.width = '280px';
-              e.target.style.background = 'var(--glass-regular-bg)';
-              e.target.style.borderColor = 'var(--primary)';
-              e.target.style.boxShadow = '0 0 0 4px color-mix(in srgb, var(--primary) 15%, transparent)';
-            }}
-            onBlur={(e) => {
-              e.target.style.width = '';
-              e.target.style.background = 'var(--glass-ultra-thin-bg)';
-              e.target.style.borderColor = 'var(--glass-ultra-thin-border)';
-              e.target.style.boxShadow = 'none';
-            }}
-          />
-        </div>
+        {/* Global Search — glass icon button */}
+        <button
+          onClick={() => setSearchOpen(true)}
+          className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer depth-press"
+          style={{
+            background: 'var(--glass-ultra-thin-bg)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '0.5px solid var(--glass-ultra-thin-border)',
+            color: 'var(--muted-foreground)',
+          }}
+          title="Search (⌘K)"
+        >
+          {icons.search}
+        </button>
 
         {/* User Profile Dropdown */}
         <div className="relative" ref={dropdownRef}>
@@ -280,6 +279,8 @@ export default function TopBar({ user }) {
           )}
         </div>
       </div>
+
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }
